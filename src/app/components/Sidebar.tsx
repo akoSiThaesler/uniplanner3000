@@ -23,13 +23,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleClick = (page: string) => (e: React.MouseEvent) => {
     // Stop the browser from refreshing the page
     e.preventDefault();
-    //
     onPageChange?.(page);
   };
 
   /**
    * Sidebar component providing navigation for the application
-   * TODO: Consider implementing:
+   * TODO: Consider implementing: All optional and up to debate for now but would be nice :D
    * - Active page highlighting
    * - Keyboard navigation
    * - Route mapping configuration object
