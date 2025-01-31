@@ -1,0 +1,19 @@
+.sidebar {
+  @apply bg-[#EDF0F7] h-screen w-64 border-r-2 border-black fixed left-0 top-0 pt-16 transition-transform duration-300 z-40;
+}
+
+.closed {
+  @apply -translate-x-full;
+}
+
+.menuList {
+  @apply flex flex-col gap-4 list-none p-4;
+}
+
+.menuItem {
+  @apply flex items-center gap-3 text-[#2D3648] hover:bg-[#2D3648] hover:text-white p-2 rounded-lg cursor-pointer;
+}
+
+.menuItem a {
+  @apply text-inherit;
+}

@@ -1,0 +1,19 @@
+.nav {
+  @apply bg-white px-4 py-3 flex justify-between items-center border-b-2 border-black relative z-50;
+}
+
+.titleRow {
+  @apply flex items-center;
+}
+
+.title {
+  @apply text-[#2D3648] text-2xl font-semibold px-2;
+}
+
+.linkList {
+  @apply flex gap-4 list-none justify-end items-center flex-1;
+}
+
+.link {
+  @apply text-[#2D3648] hover:text-white;
+}

@@ -1,0 +1,47 @@
+.footer {
+  @apply py-6 px-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-[margin] duration-300;
+}
+
+.footerOpen {
+  @apply ml-64;
+}
+
+.footerClosed {
+  @apply ml-0;
+}
+
+.container {
+  @apply max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4;
+}
+
+.teamContainer {
+  @apply flex flex-wrap justify-center items-center gap-4;
+}
+
+.madeBy {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+.memberContainer {
+  @apply flex items-center gap-2;
+}
+
+.memberName {
+  @apply text-gray-800 dark:text-gray-200;
+}
+
+.socialLinks {
+  @apply flex gap-2;
+}
+
+.socialLink {
+  @apply text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100;
+}
+
+.socialIcon {
+  @apply w-5 h-5;
+}
+
+.copyright {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
