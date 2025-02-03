@@ -39,9 +39,12 @@ const Main: React.FC<MainProps> = ({ currentPage, isOpen = true }) => {
      * - Smooth transition for margin changes
      */
     <main
-      className={`${
-        isOpen ? "ml-64" : "ml-0"
-      }  min-h-[calc(100vh-152px)] bg-gray-50 transition-[margin] duration-300`}
+      className={`${isOpen ? "ml-64" : "ml-0"}  
+      min-h-[calc(100vh-152px)]
+      bg-gray-50
+      dark:bg-gray-700
+      transition-[margin]
+      duration-300`}
     >
       {renderContent()}
     </main>

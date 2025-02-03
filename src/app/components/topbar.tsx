@@ -1,6 +1,5 @@
 import React from "react";
 import styles from "./topbar.module.css";
-import AutoStoriesSharpIcon from "@mui/icons-material/AutoStoriesSharp";
 import Image from "next/image";
 
 type NavbarProps = {

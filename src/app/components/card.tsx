@@ -15,7 +15,7 @@ const Card = () => {
         </div>
         <div className="brutalist-card__message">
           This is a brutalist card with a very angry button. Proceed with
-          caution, you've been warned.
+          caution, you&aposve been warned.
         </div>
         <div className="brutalist-card__actions">
           <a

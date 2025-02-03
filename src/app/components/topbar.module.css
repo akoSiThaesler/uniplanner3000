@@ -1,19 +1,40 @@
 .nav {
-  @apply bg-white px-4 py-3 flex justify-between items-center border-b-2 border-black relative z-50;
+  @apply bg-white 
+  px-4 
+  py-3 
+  flex 
+  justify-between 
+  items-center 
+  border-b-2 
+  border-black 
+  z-50 
+  dark:bg-gray-800 
+  dark:border-gray-700;
 }
 
 .titleRow {
-  @apply flex items-center;
+  @apply flex
+  items-center;
 }
 
 .title {
-  @apply text-[#2D3648] text-2xl font-semibold px-2;
+  @apply text-[#2D3648]
+  text-2xl
+  font-semibold
+  px-2
+  dark:text-gray-200;
 }
 
 .linkList {
-  @apply flex gap-4 list-none justify-end items-center flex-1;
+  @apply flex gap-4
+  list-none
+  justify-end
+  items-center
+  flex-1;
 }
 
 .link {
-  @apply text-[#2D3648] hover:text-white;
+  @apply text-[#2D3648]
+  hover:text-white
+  dark:text-gray-200;
 }

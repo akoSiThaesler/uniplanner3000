@@ -4,6 +4,7 @@ import Topbar from "./components/topbar";
 import Footer from "./components/footer";
 import Sidebar from "./components/Sidebar";
 import Main from "./components/Main";
+import { pages } from "./types/pages";
 
 /* TO HELP VISUALIZE THE PAGE CHANGE FUNCTIONALITY
     A[User clicks sidebar item] -->|triggers| B[handleClick in Sidebar]
@@ -15,14 +16,14 @@ import Main from "./components/Main";
     */
 
 export default function Home() {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [currentPage, setCurrentPage] = useState("dashboard"); // dashboard as default cause idk prolly change that
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [currentPage, setCurrentPage] = useState(pages.dashboard); // dashboard as default cause idk prolly change that
 
   const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handlePageChange = (page: string) => {
+  const handlePageChange = (page: pages) => {
     setCurrentPage(page); // Updates the current page
   };
 

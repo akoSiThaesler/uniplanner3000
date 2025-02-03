@@ -4,11 +4,12 @@ import HomeIcon from "@mui/icons-material/Home";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BookIcon from "@mui/icons-material/Book";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { pages } from "../types/pages";
 
 type SidebarProps = {
   children?: React.ReactNode;
   isOpen?: boolean;
-  onPageChange?: (page: string) => void;
+  onPageChange?: (page: pages) => void;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -20,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
    * @see {@link https://react.dev/learn/responding-to-events#event-handlers}
    */
 
-  const handleClick = (page: string) => (e: React.MouseEvent) => {
+  const handleClick = (page: pages) => (e: React.MouseEvent) => {
     // Stop the browser from refreshing the page
     e.preventDefault();
     onPageChange?.(page);
@@ -45,19 +46,19 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className={`${styles.sidebar} ${!isOpen ? styles.closed : ""}`}>
       <ul className={styles.menuList}>
-        <li className={styles.menuItem} onClick={handleClick("dashboard")}>
+        <li className={styles.menuItem} onClick={handleClick(pages.dashboard)}>
           <HomeIcon />
-          <a href="#">Dashboard</a>
+          <a href="#">dashboard</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("schedule")}>
+        <li className={styles.menuItem} onClick={handleClick(pages.schedule)}>
           <CalendarMonthIcon />
-          <a href="#">Schedule</a>
+          <a href="#">schedule</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("courses")}>
+        <li className={styles.menuItem} onClick={handleClick(pages.courses)}>
           <BookIcon />
-          <a href="#">Courses</a>
+          <a href="#">courses</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("settings")}>
+        <li className={styles.menuItem} onClick={handleClick(pages.settings)}>
           <SettingsIcon />
           <a href="#">Settings</a>
         </li>
