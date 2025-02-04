@@ -1,5 +1,7 @@
 .footer {
-  @apply py-6 px-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-[margin] duration-300;
+  @apply py-6 px-4 transition-[margin] duration-300 fixed bottom-0 left-0 right-0;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--foreground);
 }
 
 .footerOpen {
@@ -19,7 +21,7 @@
 }
 
 .madeBy {
-  @apply text-gray-600 dark:text-gray-400;
+  color: var(--foreground);
 }
 
 .memberContainer {
@@ -27,7 +29,7 @@
 }
 
 .memberName {
-  @apply text-gray-800 dark:text-gray-200;
+  color: var(--foreground);
 }
 
 .socialLinks {
@@ -35,7 +37,8 @@
 }
 
 .socialLink {
-  @apply text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100;
+  @apply hover:text-white;
+  color: var(--foreground);
 }
 
 .socialIcon {
@@ -43,5 +46,6 @@
 }
 
 .copyright {
-  @apply text-sm text-gray-500 dark:text-gray-400;
+  @apply text-sm;
+  color: var(--foreground);
 }

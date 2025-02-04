@@ -41,7 +41,7 @@ const Main: React.FC<MainProps> = ({ currentPage, isOpen = true }) => {
     <main
       className={`${
         isOpen ? "ml-64" : "ml-0"
-      }  min-h-[calc(100vh-152px)] bg-gray-50 transition-[margin] duration-300`}
+      } min-h-[calc(100vh-152px)] bg-[var(--background)] transition-[margin] duration-300`}
     >
       {renderContent()}
     </main>

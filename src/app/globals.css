@@ -5,12 +5,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sidebar-bg: #f5f5f5;
+  --footer-bg: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #434343;
-    --foreground: #ededed;
+    --background: #121212;
+    --foreground: #e0e0e0;
+    --sidebar-bg: #1f1f1f;
+    --footer-bg: #1f1f1f;
   }
 }
 

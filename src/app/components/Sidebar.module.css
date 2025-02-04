@@ -1,5 +1,7 @@
 .sidebar {
-  @apply bg-[#EDF0F7] h-screen w-64 border-r-2 border-black fixed left-0 top-0 pt-16 transition-transform duration-300 z-40;
+  @apply h-screen w-64 fixed left-0 top-0 pt-16 transition-transform duration-300 z-40;
+  background: var(--sidebar-bg);
+  border-right: 2px solid var(--foreground);
 }
 
 .closed {
@@ -11,7 +13,14 @@
 }
 
 .menuItem {
-  @apply flex items-center gap-3 text-[#2D3648] hover:bg-[#2D3648] hover:text-white p-2 rounded-lg cursor-pointer;
+  @apply flex items-center gap-3 p-2 rounded-lg cursor-pointer;
+  color: var(--foreground);
+  transition: background 0.2s, color 0.2s;
+}
+
+.menuItem:hover {
+  background: var(--foreground);
+  color: var(--sidebar-bg);
 }
 
 .menuItem a {
