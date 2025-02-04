@@ -1,5 +1,8 @@
 .nav {
-  @apply bg-white px-4 py-3 flex justify-between items-center border-b-2 border-black relative z-50;
+  @apply px-4 py-3 flex justify-between items-center border-b-2 relative z-50;
+  background: var(--background);
+  color: var(--foreground);
+  border-color: var(--foreground);
 }
 
 .titleRow {
@@ -7,7 +10,8 @@
 }
 
 .title {
-  @apply text-[#2D3648] text-2xl font-semibold px-2;
+  @apply text-2xl font-semibold px-2;
+  color: var(--foreground);
 }
 
 .linkList {
@@ -15,5 +19,6 @@
 }
 
 .link {
-  @apply text-[#2D3648] hover:text-white;
+  @apply hover:text-white;
+  color: var(--foreground);
 }
