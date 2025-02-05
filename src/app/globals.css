@@ -5,16 +5,36 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --sidebar-bg: #f5f5f5;
+  --sidebar-bg: #edf0f7;
   --footer-bg: #ffffff;
+
+  --border-width-thin: 1px;
+  --border-width-regular: 2px;
+  --border-width-thick: 3px;
+
+  --transition-duration: 0.3s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-background: rgba(237, 240, 247, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+  --text-on-glass: rgba(23, 23, 23, 0.9);
+  --hover-background: rgba(237, 240, 247, 0.65);
+  --active-background: rgba(23, 23, 23, 0.15);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #121212;
     --foreground: #e0e0e0;
-    --sidebar-bg: #1f1f1f;
+    --sidebar-bg: #1a1a1a;
     --footer-bg: #1f1f1f;
+
+    --glass-background: rgba(30, 30, 30, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: rgba(0, 0, 0, 0.2);
+    --text-on-glass: rgba(224, 224, 224, 0.9);
+    --hover-background: rgba(255, 255, 255, 0.1);
+    --active-background: rgba(255, 255, 255, 0.15);
   }
 }
 
@@ -22,4 +42,5 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-jetbrains-mono), "Courier New", monospace;
+  overflow: hidden;
 }
