@@ -1,11 +1,44 @@
 .sidebar {
-  @apply h-screen w-64 fixed left-0 top-0 pt-16 transition-transform duration-300 z-40;
-  background: var(--sidebar-bg);
-  border-right: 2px solid var(--foreground);
+  @apply h-screen fixed left-0 top-0 pt-16 z-40;
+  background: var(--glass-background);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: var(--border-width-regular) solid var(--glass-border);
+  transition: width var(--transition-duration) var(--transition-timing),
+    background var(--transition-duration) var(--transition-timing),
+    border-color var(--transition-duration) var(--transition-timing);
+  box-shadow: 0 4px 16px 0 var(--glass-shadow);
+}
+
+.open {
+  @apply w-64;
 }
 
 .closed {
-  @apply -translate-x-full;
+  @apply w-20;
+}
+
+.toggleButton {
+  @apply absolute right-0 top-20 transform translate-x-1/2 rounded-full w-6 h-6 flex items-center justify-center z-50;
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  border: var(--border-width-regular) solid var(--glass-border);
+  color: var(--text-on-glass);
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.toggleButton svg {
+  @apply transition-transform;
+  transition-duration: var(--transition-duration);
+}
+
+.closed .toggleButton svg {
+  @apply rotate-180;
+}
+
+.toggleButton:hover {
+  background: var(--foreground);
+  color: var(--sidebar-bg);
 }
 
 .menuList {
@@ -14,15 +47,40 @@
 
 .menuItem {
   @apply flex items-center gap-3 p-2 rounded-lg cursor-pointer;
-  color: var(--foreground);
-  transition: background 0.2s, color 0.2s;
+  background: var(--glass-background);
+  backdrop-filter: blur(8px);
+  color: var(--text-on-glass);
+  border: var(--border-width-thin) solid var(--glass-border);
+  width: calc(100% - 2rem);
+  transform: translateX(0);
+  transition: all var(--transition-duration) var(--transition-timing),
+    width var(--transition-duration) var(--transition-timing),
+    transform var(--transition-duration) var(--transition-timing);
 }
 
 .menuItem:hover {
-  background: var(--foreground);
-  color: var(--sidebar-bg);
+  background: var(--hover-background);
+  border-color: var(--glass-border);
+  box-shadow: 0 4px 16px 0 var(--glass-shadow);
+}
+
+.menuItem.active {
+  background: var(--active-background);
+  border-color: var(--foreground);
+  box-shadow: 0 4px 16px 0 var(--glass-shadow);
+}
+
+.closed .menuItem {
+  @apply w-10;
+  transition: width var(--transition-duration) var(--transition-timing);
 }
 
 .menuItem a {
-  @apply text-inherit;
+  @apply text-inherit opacity-100 translate-x-0;
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.closed .menuItem a {
+  @apply opacity-0 -translate-x-5 pointer-events-none;
+  transition: all var(--transition-duration) var(--transition-timing);
 }

@@ -4,60 +4,93 @@ import HomeIcon from "@mui/icons-material/Home";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BookIcon from "@mui/icons-material/Book";
 import SettingsIcon from "@mui/icons-material/Settings";
+import Notifications from "@mui/icons-material/Notifications";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 type SidebarProps = {
   children?: React.ReactNode;
   isOpen?: boolean;
   onPageChange?: (page: string) => void;
+  onSidebarToggle?: (isOpen: boolean) => void;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({
   children,
-  isOpen = true,
+  isOpen: defaultIsOpen = true,
   onPageChange,
+  onSidebarToggle,
 }) => {
-  /**
-   * @see {@link https://react.dev/learn/responding-to-events#event-handlers}
-   */
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(defaultIsOpen);
+  const [activePage, setActivePage] = React.useState("dashboard");
 
   const handleClick = (page: string) => (e: React.MouseEvent) => {
-    // Stop the browser from refreshing the page
     e.preventDefault();
+    setActivePage(page);
     onPageChange?.(page);
   };
 
-  /**
-   * Sidebar component providing navigation for the application
-   * TODO: Consider implementing: All optional and up to debate for now but would be nice :D
-   * - Active page highlighting
-   * - Keyboard navigation
-   * - Route mapping configuration object
-   * Currently optional and am not 100% sure it works, but already see the problem that
-   * If the user refreshes the site while the user is in a different "page" it resets them back to the default page. Would be a nice Imporvement point !
-   * - Next.js Link component for proper routing
-   * https://react.dev/learn/responding-to-events
-   * https://nextjs.org/docs/pages/building-your-application/routing
-   * https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts
-   * https://nextjs.org/docs/app/building-your-application/routing/defining-routes - Defining Routes
-   * https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating - Navigation
-   */
+  const toggleSidebar = () => {
+    const newState = !isSidebarOpen;
+    setIsSidebarOpen(newState);
+    onSidebarToggle?.(newState);
+  };
 
   return (
-    <div className={`${styles.sidebar} ${!isOpen ? styles.closed : ""}`}>
+    <div
+      className={`${styles.sidebar} ${
+        isSidebarOpen ? styles.open : styles.closed
+      }`}
+    >
+      <button
+        onClick={toggleSidebar}
+        className={styles.toggleButton}
+        aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+      >
+        <ArrowBackIosNewIcon sx={{ fontSize: "15px" }} />
+      </button>
       <ul className={styles.menuList}>
-        <li className={styles.menuItem} onClick={handleClick("dashboard")}>
+        <li
+          className={`${styles.menuItem} ${
+            activePage === "dashboard" ? styles.active : ""
+          }`}
+          onClick={handleClick("dashboard")}
+        >
           <HomeIcon />
           <a href="#">Dashboard</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("schedule")}>
+        <li
+          className={`${styles.menuItem} ${
+            activePage === "schedule" ? styles.active : ""
+          }`}
+          onClick={handleClick("schedule")}
+        >
           <CalendarMonthIcon />
           <a href="#">Schedule</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("courses")}>
+        <li
+          className={`${styles.menuItem} ${
+            activePage === "courses" ? styles.active : ""
+          }`}
+          onClick={handleClick("courses")}
+        >
           <BookIcon />
           <a href="#">Courses</a>
         </li>
-        <li className={styles.menuItem} onClick={handleClick("settings")}>
+        <li
+          className={`${styles.menuItem} ${
+            activePage === "settings" ? styles.active : ""
+          }`}
+          onClick={handleClick("settings")}
+        >
+          <Notifications />
+          <a href="#">Notifications</a>
+        </li>
+        <li
+          className={`${styles.menuItem} ${
+            activePage === "settings" ? styles.active : ""
+          }`}
+          onClick={handleClick("settings")}
+        >
           <SettingsIcon />
           <a href="#">Settings</a>
         </li>

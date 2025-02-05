@@ -1,7 +1,7 @@
 .footer {
   @apply py-6 px-4 transition-[margin] duration-300 fixed bottom-0 left-0 right-0;
   background: var(--footer-bg);
-  border-top: 1px solid var(--foreground);
+  border-top: var(--border-width-thin) solid var(--foreground);
 }
 
 .footerOpen {
@@ -9,7 +9,7 @@
 }
 
 .footerClosed {
-  @apply ml-0;
+  @apply ml-20;
 }
 
 .container {
