@@ -21,14 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Analytics>
-      <SpeedInsights>
-        <html lang="en">
-          <body className={`${jetbrainsMono.variable} antialiased`}>
-            {children}
-          </body>
-        </html>
-      </SpeedInsights>
-    </Analytics>
+    <html lang="en">
+      <body className={`${jetbrainsMono.variable} antialiased`}>
+        {children}
+        <SpeedInsights />
+        <Analytics />
+      </body>
+    </html>
   );
 }
