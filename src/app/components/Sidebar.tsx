@@ -19,7 +19,6 @@ type SidebarProps = {
 const Sidebar: React.FC<SidebarProps> = ({
   children,
   isOpen: defaultIsOpen = true,
-  onPageChange,
   onSidebarToggle,
 }) => {
   const pathname = usePathname();

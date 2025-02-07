@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -19,10 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${jetbrainsMono.variable} antialiased`}>
-        {children}
-      </body>
-    </html>
+    <Analytics>
+      <SpeedInsights>
+        <html lang="en">
+          <body className={`${jetbrainsMono.variable} antialiased`}>
+            {children}
+          </body>
+        </html>
+      </SpeedInsights>
+    </Analytics>
   );
 }
