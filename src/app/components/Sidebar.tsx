@@ -12,7 +12,6 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 type SidebarProps = {
   children?: React.ReactNode;
   isOpen?: boolean;
-  onPageChange?: (page: string) => void;
   onSidebarToggle?: (isOpen: boolean) => void;
 };
 
