@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <li
             title="Courses"
             className={`${styles.menuItem} ${
-              pathname === "/webapp/courses" ? styles.active : ""
+              pathname === "/webapp/Courses" ? styles.active : ""
             }`}
           >
             <BookIcon />
