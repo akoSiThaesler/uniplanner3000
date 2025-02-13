@@ -80,18 +80,18 @@ const Sidebar: React.FC<SidebarProps> = ({
           <li
             title="Notifications"
             className={`${styles.menuItem} ${
-              pathname === "/webapp/notifications" ? styles.active : ""
+              pathname === "/webapp/Notifications" ? styles.active : ""
             }`}
           >
             <Notifications />
             <span>Notifications</span>
           </li>
         </Link>
-        <Link href="/webapp/settings">
+        <Link href="/webapp/Settings">
           <li
             title="Settings"
             className={`${styles.menuItem} ${
-              pathname === "/webapp/settings" ? styles.active : ""
+              pathname === "/webapp/Settings" ? styles.active : ""
             }`}
           >
             <SettingsIcon />
