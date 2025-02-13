@@ -34,6 +34,7 @@
   --highlight-hover: #2563eb; /* Blue 600 - Darker */
   --button-padding: 1rem 0.5rem;
   --button-radius: 0.25rem;
+  --vignette-opacity: 0.05;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,6 +53,7 @@
     --active-background: rgba(255, 255, 255, 0.15); /* White 15% */
 
     --dot-color: #2d2d2d; /* Dark Gray Dots */
+    --vignette-opacity: 0.3;
   }
 }
 
@@ -59,5 +61,4 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-jetbrains-mono), "Courier New", monospace;
-  overflow: hidden;
 }

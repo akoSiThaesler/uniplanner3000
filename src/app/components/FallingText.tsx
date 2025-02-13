@@ -2,6 +2,16 @@ import { useRef, useState, useEffect } from "react";
 import Matter from "matter-js";
 import "./FallingText.css";
 
+interface FallingTextProps {
+  text?: string;
+  highlightWords?: string[];
+  highlightClass?: string;
+  backgroundColor?: string;
+  wireframes?: boolean;
+  gravity?: number;
+  mouseConstraintStiffness?: number;
+}
+
 const FallingText = ({
   text = "This is a sample falling text",
   highlightWords = [],
@@ -10,7 +20,7 @@ const FallingText = ({
   wireframes = false,
   gravity = 0.2,
   mouseConstraintStiffness = 1,
-}) => {
+}: FallingTextProps) => {
   const outerContainerRef = useRef<HTMLDivElement>(null);
   const simulationRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -97,7 +107,9 @@ const FallingText = ({
         Bodies.rectangle(width + 10, height / 2, 20, height, boundaryOptions),
       ];
 
-      const wordSpans = textRef.current.querySelectorAll(".word");
+      const wordSpans = textRef.current
+        ? textRef.current.querySelectorAll(".word")
+        : [];
       const wordBodies = Array.from(wordSpans).map((elem) => {
         const rect = elem.getBoundingClientRect();
         const simRect = simulationEl.getBoundingClientRect();
@@ -159,10 +171,10 @@ const FallingText = ({
           const { x, y } = body.position;
           const w = body.bounds.max.x - body.bounds.min.x;
           const h = body.bounds.max.y - body.bounds.min.y;
-          elem.style.position = "absolute";
-          elem.style.left = `${x - w / 2}px`;
-          elem.style.top = `${y - h / 2}px`;
-          elem.style.transform = `rotate(${body.angle}rad)`;
+          (elem as HTMLElement).style.position = "absolute";
+          (elem as HTMLElement).style.left = `${x - w / 2}px`;
+          (elem as HTMLElement).style.top = `${y - h / 2}px`;
+          (elem as HTMLElement).style.transform = `rotate(${body.angle}rad)`;
         });
         Matter.Engine.update(engine, 16);
         animationFrameRef.current = requestAnimationFrame(updateLoop);
@@ -170,16 +182,17 @@ const FallingText = ({
 
       updateLoop();
 
+      const canvasContainer = canvasContainerRef.current;
       return () => {
         if (animationFrameRef.current)
           cancelAnimationFrame(animationFrameRef.current);
         Mouse.clearSourceEvents(mouse);
         Render.stop(render);
         Runner.stop(runner);
-        if (render.canvas && canvasContainerRef.current) {
-          canvasContainerRef.current.removeChild(render.canvas);
+        if (render.canvas && canvasContainer) {
+          canvasContainer.removeChild(render.canvas);
         }
-        World.clear(engine.world);
+        World.clear(engine.world, false);
         Engine.clear(engine);
         engineRef.current = null;
       };
