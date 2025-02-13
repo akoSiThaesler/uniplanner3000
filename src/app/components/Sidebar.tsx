@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "./Sidebar.module.css";
 import HomeIcon from "@mui/icons-material/Home";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
@@ -10,24 +12,16 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 type SidebarProps = {
   children?: React.ReactNode;
   isOpen?: boolean;
-  onPageChange?: (page: string) => void;
   onSidebarToggle?: (isOpen: boolean) => void;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({
   children,
   isOpen: defaultIsOpen = true,
-  onPageChange,
   onSidebarToggle,
 }) => {
+  const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(defaultIsOpen);
-  const [activePage, setActivePage] = React.useState("dashboard");
-
-  const handleClick = (page: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    setActivePage(page);
-    onPageChange?.(page);
-  };
 
   const toggleSidebar = () => {
     const newState = !isSidebarOpen;
@@ -51,48 +45,47 @@ const Sidebar: React.FC<SidebarProps> = ({
       <ul className={styles.menuList}>
         <li
           className={`${styles.menuItem} ${
-            activePage === "dashboard" ? styles.active : ""
+            pathname === "/webapp" ? styles.active : ""
           }`}
-          onClick={handleClick("dashboard")}
         >
           <HomeIcon />
-          <a href="#">Dashboard</a>
+          <Link href="/webapp" prefetch>
+            Dashboard
+          </Link>
         </li>
         <li
           className={`${styles.menuItem} ${
-            activePage === "schedule" ? styles.active : ""
+            pathname === "/webapp/Schedule" ? styles.active : ""
           }`}
-          onClick={handleClick("schedule")}
         >
           <CalendarMonthIcon />
-          <a href="#">Schedule</a>
+          <Link href="/webapp/Schedule" prefetch>
+            Schedule
+          </Link>
         </li>
         <li
           className={`${styles.menuItem} ${
-            activePage === "courses" ? styles.active : ""
+            pathname === "/webapp/courses" ? styles.active : ""
           }`}
-          onClick={handleClick("courses")}
         >
           <BookIcon />
-          <a href="#">Courses</a>
+          <Link href="/webapp/courses">Courses</Link>
         </li>
         <li
           className={`${styles.menuItem} ${
-            activePage === "settings" ? styles.active : ""
+            pathname === "/webapp/notifications" ? styles.active : ""
           }`}
-          onClick={handleClick("settings")}
         >
           <Notifications />
-          <a href="#">Notifications</a>
+          <Link href="/webapp/notifications">Notifications</Link>
         </li>
         <li
           className={`${styles.menuItem} ${
-            activePage === "settings" ? styles.active : ""
+            pathname === "/webapp/settings" ? styles.active : ""
           }`}
-          onClick={handleClick("settings")}
         >
           <SettingsIcon />
-          <a href="#">Settings</a>
+          <Link href="/webapp/settings">Settings</Link>
         </li>
       </ul>
       {children}

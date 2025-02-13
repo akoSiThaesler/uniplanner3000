@@ -20,16 +20,13 @@ export default function ClientLayout({
       <Topbar />
       <div className="flex flex-1">
         <Sidebar isOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
-
-        <div
-          className={`flex flex-col flex-1 transition-all duration-300 ${
-            isSidebarOpen ? "ml-64" : "ml-20"
-          }`}
-        >
+        <div className="flex flex-col flex-1 ml-20">
+          {" "}
+          {/* Fixed margin for closed sidebar width */}
           <main className="flex-1 p-4">{children}</main>
+          <Footer />
         </div>
       </div>
-      <Footer isOpen={isSidebarOpen} />
     </div>
   );
 }
