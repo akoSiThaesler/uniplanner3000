@@ -47,7 +47,7 @@
   @apply absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer z-[4] opacity-0 pointer-events-none;
   width: 50px;
   height: 28px;
-  background-color: var(--glass-background);
+  background-color: var(--dot-color);
   border-radius: 14px;
   transition: opacity var(--transition-duration) var(--transition-timing),
     background-color var(--transition-duration) var(--transition-timing);
