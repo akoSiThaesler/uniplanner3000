@@ -1,0 +1,91 @@
+/* Base container */
+.falling-text-container {
+  @apply relative mx-auto;
+  width: 800px;
+  height: 400px;
+  background-color: transparent;
+}
+
+/* Header section */
+.falling-text-header {
+  @apply absolute top-0 left-0 w-full z-[3];
+  height: 40px;
+}
+
+.header-bg {
+  @apply absolute inset-0 pointer-events-auto;
+  background: transparent;
+}
+
+/* Simulation area */
+.falling-text-simulation {
+  @apply absolute inset-x-0 bottom-0 overflow-hidden;
+  top: 40px;
+}
+
+/* Text elements */
+.falling-text-target {
+  @apply absolute top-0 left-0 w-full pointer-events-none text-2xl z-[1];
+  line-height: 1.4;
+}
+
+.falling-text-canvas {
+  @apply absolute inset-0 w-full h-full pointer-events-none z-0;
+}
+
+.word {
+  @apply inline-block;
+}
+
+.highlighted {
+  @apply font-bold;
+  color: var(--highlight-color);
+}
+
+/* Toggle switch */
+.toggle-switch {
+  @apply absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer z-[4] opacity-0 pointer-events-none;
+  width: 50px;
+  height: 28px;
+  background-color: var(--glass-background);
+  border-radius: 14px;
+  transition: opacity var(--transition-duration) var(--transition-timing),
+    background-color var(--transition-duration) var(--transition-timing);
+}
+
+.toggle-switch.active {
+  @apply opacity-100 pointer-events-auto;
+  background-color: var(--highlight-color);
+}
+
+.toggle-switch .toggle-knob {
+  @apply absolute top-0.5 left-0.5 bg-white rounded-full;
+  width: 24px;
+  height: 24px;
+  transition: transform var(--transition-duration) var(--transition-timing);
+}
+
+.toggle-switch.active .toggle-knob {
+  transform: translateX(22px);
+}
+
+.falling-text-container:hover .toggle-switch {
+  @apply opacity-100 pointer-events-auto;
+}
+
+/* Hover prompt */
+.hover-prompt {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+         text-black text-4xl pointer-events-none z-10;
+  background: none;
+  text-shadow: 0 0 8px;
+  transition: opacity 0.8s var(--transition-timing);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .falling-text-container {
+    @apply w-full;
+    height: 300px;
+  }
+}
