@@ -70,17 +70,17 @@
   box-shadow: 0 4px 16px 0 var(--glass-shadow);
 }
 
-.closed .menuItem {
-  @apply w-10;
-  transition: width var(--transition-duration) var(--transition-timing);
-}
-
-.menuItem a {
-  @apply text-inherit opacity-100 translate-x-0;
+.menuItem span {
+  @apply opacity-100 translate-x-0;
   transition: all var(--transition-duration) var(--transition-timing);
 }
 
-.closed .menuItem a {
+.closed .menuItem {
+  @apply w-10;
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.closed .menuItem span {
   @apply opacity-0 -translate-x-5 pointer-events-none;
   transition: all var(--transition-duration) var(--transition-timing);
 }

@@ -43,50 +43,61 @@ const Sidebar: React.FC<SidebarProps> = ({
         <ArrowBackIosNewIcon sx={{ fontSize: "15px" }} />
       </button>
       <ul className={styles.menuList}>
-        <li
-          className={`${styles.menuItem} ${
-            pathname === "/webapp" ? styles.active : ""
-          }`}
-        >
-          <HomeIcon />
-          <Link href="/webapp" prefetch>
-            Dashboard
-          </Link>
-        </li>
-        <li
-          className={`${styles.menuItem} ${
-            pathname === "/webapp/Schedule" ? styles.active : ""
-          }`}
-        >
-          <CalendarMonthIcon />
-          <Link href="/webapp/Schedule" prefetch>
-            Schedule
-          </Link>
-        </li>
-        <li
-          className={`${styles.menuItem} ${
-            pathname === "/webapp/courses" ? styles.active : ""
-          }`}
-        >
-          <BookIcon />
-          <Link href="/webapp/courses">Courses</Link>
-        </li>
-        <li
-          className={`${styles.menuItem} ${
-            pathname === "/webapp/notifications" ? styles.active : ""
-          }`}
-        >
-          <Notifications />
-          <Link href="/webapp/notifications">Notifications</Link>
-        </li>
-        <li
-          className={`${styles.menuItem} ${
-            pathname === "/webapp/settings" ? styles.active : ""
-          }`}
-        >
-          <SettingsIcon />
-          <Link href="/webapp/settings">Settings</Link>
-        </li>
+        <Link href="/webapp">
+          <li
+            title={isSidebarOpen ? "" : "Dashboard"}
+            className={`${styles.menuItem} ${
+              pathname === "/webapp" ? styles.active : ""
+            }`}
+          >
+            <HomeIcon />
+            <span>Dashboard</span>
+          </li>
+        </Link>
+        <Link href="/webapp/Schedule">
+          <li
+            title="Schedule"
+            className={`${styles.menuItem} ${
+              pathname === "/webapp/Schedule" ? styles.active : ""
+            }`}
+          >
+            <CalendarMonthIcon />
+            <span>Schedule</span>
+          </li>
+        </Link>
+        <Link href="/webapp/courses">
+          <li
+            title="Courses"
+            className={`${styles.menuItem} ${
+              pathname === "/webapp/Courses" ? styles.active : ""
+            }`}
+          >
+            <BookIcon />
+            <span>Courses</span>
+          </li>
+        </Link>
+        <Link href="/webapp/notifications">
+          <li
+            title="Notifications"
+            className={`${styles.menuItem} ${
+              pathname === "/webapp/notifications" ? styles.active : ""
+            }`}
+          >
+            <Notifications />
+            <span>Notifications</span>
+          </li>
+        </Link>
+        <Link href="/webapp/settings">
+          <li
+            title="Settings"
+            className={`${styles.menuItem} ${
+              pathname === "/webapp/settings" ? styles.active : ""
+            }`}
+          >
+            <SettingsIcon />
+            <span>Settings</span>
+          </li>
+        </Link>
       </ul>
       {children}
     </div>

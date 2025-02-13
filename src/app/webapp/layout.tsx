@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+
 import Topbar from "../components/topbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/footer";
@@ -21,9 +22,16 @@ export default function ClientLayout({
       <div className="flex flex-1">
         <Sidebar isOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
         <div className="flex flex-col flex-1 ml-20">
-          {" "}
-          {/* Fixed margin for closed sidebar width */}
-          <main className="flex-1 p-4">{children}</main>
+          <div
+            className="
+            relative h-full w-full 
+            bg-[--background]
+            bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
+            [background-size:var(--dot-spacing)_var(--dot-spacing)]
+          "
+          >
+            <main className="flex-1 p-4">{children}</main>
+          </div>
           <Footer />
         </div>
       </div>

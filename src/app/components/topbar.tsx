@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./topbar.module.css";
 import AutoStoriesSharpIcon from "@mui/icons-material/AutoStoriesSharp";
+import Link from "next/link";
 
 type NavbarProps = {
   children?: React.ReactNode;
@@ -36,9 +37,9 @@ const NavBar: React.FC<NavbarProps> = ({ children, onMenuClick }) => {
       </div>
       <ul className={styles.linkList}>
         <li>
-          <a href="#home" className={styles.link}>
+          <Link href="/" className={styles.link}>
             Home
-          </a>
+          </Link>
         </li>
         <li>
           <a href="#about" className={styles.link}>
