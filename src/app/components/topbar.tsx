@@ -1,6 +1,9 @@
 import React from "react";
+import { useMediaQuery } from "./useMediaQuery";
 import styles from "./topbar.module.css";
 import AutoStoriesSharpIcon from "@mui/icons-material/AutoStoriesSharp";
+import HomeIcon from "@mui/icons-material/Home";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import Link from "next/link";
 
 type NavbarProps = {
@@ -24,7 +27,10 @@ I.e
 */
 
 const NavBar: React.FC<NavbarProps> = ({ children, onMenuClick }) => {
-  return (
+  const MOBILE_BREAKPOINT = "(max-width: 768px)";
+  const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
+
+  return !isMobile ? (
     <nav className={styles.nav}>
       <div className={styles.titleRow}>
         <AutoStoriesSharpIcon
@@ -45,6 +51,29 @@ const NavBar: React.FC<NavbarProps> = ({ children, onMenuClick }) => {
           <a href="#about" className={styles.link}>
             About
           </a>
+        </li>
+      </ul>
+      {children}
+    </nav>
+  ) : (
+    <nav className={styles.nav}>
+      <div className={styles.titleRow}>
+        <AutoStoriesSharpIcon
+          width="24px"
+          height="24px"
+          onClick={onMenuClick}
+          style={{ cursor: "pointer" }}
+        />
+        <h1 className={styles.title}>Uniplanner</h1>
+      </div>
+      <ul className={styles.linkList}>
+        <li>
+          <Link href="/" className={styles.link}>
+            <HomeIcon />
+          </Link>
+          <Link href="#">
+            <GitHubIcon />
+          </Link>
         </li>
       </ul>
       {children}
