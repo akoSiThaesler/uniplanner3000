@@ -1,73 +1,51 @@
 "use client";
-import { useState } from "react";
 import { useMediaQuery } from "../components/useMediaQuery";
-
-import Topbar from "../components/topbar";
-import Sidebar from "../components/Sidebar";
+import NavBar from "../components/topbar";
 import Footer from "../components/footer";
-/* import AccountSettings from "../components/AccountSettings"; */
-import Dockbar from "../components/Dockbar";
+import ResponsiveNavigation from "../components/ResponsiveNavigation";
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-
-  const handleSidebarToggle = (isOpen: boolean) => {
-    setSidebarOpen(isOpen);
-  };
-
   const MOBILE_BREAKPOINT = "(max-width: 768px)";
+  const unreadCount = 3;
   const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
 
   return !isMobile ? (
+    // Desktop layout
     <div className="flex flex-col min-h-screen">
-      <Topbar>
-        {/*       <AccountSettings
-          username="JohnDoe"
-          icon="https://via.placeholder.com/32"
-        >
-          <div>
-            <p className="py-1 hover:underline cursor-pointer">
-              Profile Settings
-            </p>
-            <p className="py-1 hover:underline cursor-pointer">Logout</p>
-          </div>
-        </AccountSettings> */}
-      </Topbar>
+      {/* Topbar spans the full width */}
+      <NavBar />
       <div className="flex flex-1">
-        <Sidebar isOpen={isSidebarOpen} onSidebarToggle={handleSidebarToggle} />
-        <div className="flex flex-col flex-1 ml-20">
-          <div
-            className="
-            relative h-full w-full 
-            bg-[--background]
-            bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
-            [background-size:var(--dot-spacing)_var(--dot-spacing)]
-          "
-          >
-            <main className="flex-1 p-4">{children}</main>
-          </div>
+        {/* Fixed Sidebar */}
+        <ResponsiveNavigation unreadCount={unreadCount} />
+        {/* Main content area with left margin to account for sidebar.
+            The relative container applies the dotted background */}
+        <div
+          className="flex flex-col flex-1 ml-20 min-h-0 relative
+          bg-[var(--background)]
+          bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
+          [background-size:var(--dot-spacing)_var(--dot-spacing)]"
+        >
+          <main className="flex-1 p-4">{children}</main>
           <Footer />
         </div>
       </div>
     </div>
   ) : (
+    // Mobile layout
     <div
-      className="
-    relative h-screen w-full 
-    bg-[--background]
-    bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
-    [background-size:var(--dot-spacing)_var(--dot-spacing)]
-  "
+      className="flex flex-col min-h-screen relative w-full 
+        bg-[var(--background)]
+        bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
+        [background-size:var(--dot-spacing)_var(--dot-spacing)]"
     >
-      <Topbar />
-      <main className="flex-1 p-4">{children}</main>
-      <div className="absolute bottom-0 flex justify-center w-full">
-        <Dockbar direction="horizontal" />
-      </div>
+      <NavBar />
+      {/* Ensure main content has extra bottom padding to avoid overlap with fixed dockbar */}
+      <main className="flex-1 p-4 pb-24">{children}</main>
+      <ResponsiveNavigation unreadCount={unreadCount} />
     </div>
   );
 }

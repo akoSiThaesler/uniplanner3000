@@ -39,6 +39,8 @@ export default function NotificationsPage(): JSX.Element {
   const [notifications, setNotifications] =
     useState<Notification[]>(exampleNotifications);
 
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   function markAsRead(key: number) {
     setNotifications((prev) =>
       prev.map((n) => (n.key === key ? { ...n, isRead: true } : n))
@@ -124,7 +126,14 @@ export default function NotificationsPage(): JSX.Element {
 
   return (
     <>
-      <h1 className="text-xl">Notifications</h1>
+      <h1 className="text-xl flex items-center">
+        Notifications
+        {unreadCount > 0 && (
+          <span className="bg-red-500 text-white rounded-full px-2 py-1 ml-2 text-sm">
+            {unreadCount}
+          </span>
+        )}
+      </h1>
       {getUnreadNotificationCards()}
       {getReadNotificationCards()}
     </>

@@ -76,7 +76,7 @@
 }
 
 .closed .menuItem {
-  @apply w-10;
+  @apply w-11;
   transition: all var(--transition-duration) var(--transition-timing);
 }
 
