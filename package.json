@@ -17,6 +17,7 @@
     "autoprefixer": "^10.4.20",
     "framer-motion": "^12.4.2",
     "matter-js": "^0.20.0",
+    "motion": "^12.4.3",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

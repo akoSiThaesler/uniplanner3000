@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <span>Schedule</span>
           </li>
         </Link>
-        <Link href="/webapp/courses">
+        <Link href="/webapp/Courses">
           <li
             title="Courses"
             className={`${styles.menuItem} ${

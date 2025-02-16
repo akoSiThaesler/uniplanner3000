@@ -55,7 +55,7 @@ export default function Footer({ isOpen = true }: FooterProps): JSX.Element {
     <footer
       className={`${styles.footer} ${
         isOpen ? styles.footerOpen : styles.footerClosed
-      }`}
+      } fixed bottom-0 left-20 w-full`}
     >
       <div className={styles.container}>
         <div className={styles.teamContainer}>
