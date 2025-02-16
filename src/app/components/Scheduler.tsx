@@ -228,11 +228,11 @@ const Scheduler: React.FC = () => {
   };
 
   // Return events for a given time slot and day.
-  const getEventsForSlot = (time: string, day: string) => {
+  /*  const getEventsForSlot = (time: string, day: string) => {
     return events.filter(
       (event) => event.startTime === time && event.day === day
     );
-  };
+  }; */
 
   // Determine if a cell is selected (for highlighting).
   const isCellSelected = (time: string, day: string): boolean => {
