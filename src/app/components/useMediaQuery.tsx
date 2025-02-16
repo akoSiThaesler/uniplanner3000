@@ -6,21 +6,29 @@ import { useEffect, useMemo, useState } from "react";
  * @returns True if the media query matches, false otherwise.
  */
 export function useMediaQuery(mediaQuery: string): boolean {
+  // Remove any '@media' text from the query.
   const mediaQueryWithoutAtMedia = useMemo(
-    () => mediaQuery.replace(/@media( ?)/, ""),
+    () => mediaQuery.replace(/@media\s*/, ""),
     [mediaQuery]
   );
-  const media = useMemo(
-    () => window.matchMedia(mediaQueryWithoutAtMedia),
-    [mediaQueryWithoutAtMedia]
-  );
-  const [matches, setMatches] = useState(media.matches);
+
+  // Set initial state safely (if window is undefined, default to false)
+  const [matches, setMatches] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia(mediaQueryWithoutAtMedia).matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    const listener = (): void => setMatches(media.matches);
+    if (typeof window === "undefined") return; // exit if on server
+
+    const media = window.matchMedia(mediaQueryWithoutAtMedia);
+    const listener = () => setMatches(media.matches);
+    // Listen for changes in the media query
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
-  }, [media]);
+  }, [mediaQueryWithoutAtMedia]);
 
   return matches;
 }
