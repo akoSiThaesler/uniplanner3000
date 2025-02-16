@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function courses() {
+export default function Courses() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
