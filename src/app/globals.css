@@ -8,6 +8,13 @@
   --foreground: #171717; /* Almost Black */
   --sidebar-bg: #edf0f7; /* Light Blue Gray */
   --footer-bg: #ffffff; /* Pure White */
+  --navbar-background: rgba(
+    23,
+    23,
+    23,
+    0.8
+  ); /* Dark background with transparency */
+  --navbar-foreground: #f0f0f0; /* Light text/icons */
 
   /* Border widths */
   --border-width-thin: 1px;
@@ -26,12 +33,14 @@
   --hover-background: rgba(237, 240, 247, 0.65); /* Light Blue Gray 65% */
   --active-background: rgba(23, 23, 23, 0.15); /* Dark Gray 15% */
 
+  /* Accent & Highlight */
+  --highlight-color: #3b82f6; /* Blue 500 */
+  --highlight-hover: #2563eb; /* Blue 600 - Darker */
+
   /* Landing page specific */
   --dot-color: #e5e7eb; /* Light Gray */
   --dot-size: 1px;
   --dot-spacing: 16px;
-  --highlight-color: #3b82f6; /* Blue 500 */
-  --highlight-hover: #2563eb; /* Blue 600 - Darker */
   --button-padding: 1rem 0.5rem;
   --button-radius: 0.25rem;
   --vignette-opacity: 0.05;
@@ -53,7 +62,7 @@
     --active-background: rgba(255, 255, 255, 0.15); /* White 15% */
 
     --dot-color: #2d2d2d; /* Dark Gray Dots */
-    --vignette-opacity: 0.3;
+    --vignette-opacity: 0.2;
   }
 }
 

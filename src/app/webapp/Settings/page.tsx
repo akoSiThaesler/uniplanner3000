@@ -2,61 +2,61 @@
 
 import { useState } from "react";
 
-type settingsOption = {
+type SettingsOption = {
   key: number;
   title: string;
   explanation: string;
   value: boolean;
-  topic: settingsTopics;
+  topic: SettingsTopics;
 };
 
-enum settingsTopics {
+enum SettingsTopics {
   GENERAL = "General Settings",
-  PRIVACY = "Privacy Settings"
+  PRIVACY = "Privacy Settings",
 }
 
-const settingsOptions: settingsOption[] = [
+const settingsOptions: SettingsOption[] = [
   {
     key: 1,
     title: "Dark mode",
-    explanation: "Turn the whole website into a dark theme, when activated",
+    explanation: "Turn the whole website into a dark theme when activated",
     value: true,
-    topic: settingsTopics.GENERAL,
+    topic: SettingsTopics.GENERAL,
   },
   {
     key: 2,
     title: "Other mode",
     explanation: "Some description",
     value: false,
-    topic: settingsTopics.GENERAL,
+    topic: SettingsTopics.GENERAL,
   },
   {
     key: 3,
-    title: "Another general Setting",
+    title: "Another general setting",
     explanation: "Another description",
     value: true,
-    topic: settingsTopics.GENERAL,
+    topic: SettingsTopics.GENERAL,
   },
   {
     key: 4,
-    title: "First Privacy Setting",
-    explanation: "Turn the whole website into a dark theme, when activated",
+    title: "First privacy setting",
+    explanation: "Turn the website into a dark theme when activated",
     value: true,
-    topic: settingsTopics.PRIVACY,
+    topic: SettingsTopics.PRIVACY,
   },
   {
     key: 5,
-    title: "Second Privacy Setting",
+    title: "Second privacy setting",
     explanation: "Some description",
     value: true,
-    topic: settingsTopics.PRIVACY,
+    topic: SettingsTopics.PRIVACY,
   },
   {
     key: 6,
-    title: "One more Privacy Setting",
+    title: "One more privacy setting",
     explanation: "Another description",
     value: false,
-    topic: settingsTopics.PRIVACY,
+    topic: SettingsTopics.PRIVACY,
   },
 ];
 
@@ -75,31 +75,33 @@ export default function Settings() {
     );
   }
 
-  function getCheckbox(note: settingsOption) {
+  function getCheckbox(option: SettingsOption) {
     return (
       <input
         type="checkbox"
-        checked={note.value}
-        onChange={() => toggleCheckbox(note.key)}
+        checked={option.value}
+        onChange={() => toggleCheckbox(option.key)}
         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm"
       />
     );
   }
 
-  function getSettingsLine(note: settingsOption) {
-    return <div className="flex justify-between items-center pt-4">
-      <div className="flex">
-        <div className="py-1"></div>
-        <div>
-          <p className="text-l font-bold">{note.title}</p>
-          <p className="text-sm">{note.explanation}</p>
+  function getSettingsLine(option: SettingsOption) {
+    return (
+      <div className="flex justify-between items-center pt-4">
+        <div className="flex">
+          <div className="py-1"></div>
+          <div>
+            <p className="text-base font-bold">{option.title}</p>
+            <p className="text-sm">{option.explanation}</p>
+          </div>
         </div>
+        {getCheckbox(option)}
       </div>
-      {getCheckbox(note)}
-    </div>;
+    );
   }
 
-  function getTopicCard(topic: settingsTopics) {
+  function getTopicCard(topic: SettingsTopics) {
     return (
       <div
         key={topic}
@@ -107,9 +109,18 @@ export default function Settings() {
         role="alert"
       >
         <h1 className="text-xl font-bold">{topic}</h1>
-        {settings.filter(so => so.topic === topic).map(s => getSettingsLine(s))}
+        {settings
+          .filter((option) => option.topic === topic)
+          .map((option) => (
+            <div key={option.key}>{getSettingsLine(option)}</div>
+          ))}
       </div>
     );
   }
-  return <div className="p-4">{uniqueTopics.map(topic => getTopicCard(topic))}</div>;
+
+  return (
+    <div className="p-4">
+      {uniqueTopics.map((topic) => getTopicCard(topic as SettingsTopics))}
+    </div>
+  );
 }

@@ -38,7 +38,7 @@ export default function Landing() {
     >
       {/* Vignette Overlay */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none z-[1000]"
         style={{
           background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,var(--vignette-opacity)) 100%)`,
         }}
@@ -103,8 +103,7 @@ export default function Landing() {
                 Easy Scheduling
               </h3>
               <p className="text-[var(--foreground)] opacity-80">
-                Organize your course timetable with a simple drag-and-drop
-                interface.
+                Organize your course timetable with a simple interface.
               </p>
             </div>
             <div>
@@ -113,6 +112,7 @@ export default function Landing() {
               </h3>
               <p className="text-[var(--foreground)] opacity-80">
                 Customize your dashboard with widgets that matter most to you.
+                (w.i.p)
               </p>
             </div>
             <div>

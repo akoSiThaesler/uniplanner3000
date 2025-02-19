@@ -28,14 +28,13 @@ const FallingText = ({
   const animationFrameRef = useRef<number | null>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
 
-  const [isFixed, setIsFixed] = useState(false);
+  const [isFixed, setIsFixed] = useState(true);
   const fixedRef = useRef(isFixed);
   const reassembleRef = useRef(false);
   const [isReady, setIsReady] = useState(false);
 
   // New state to control hover prompt visibility.
   const [showHoverPrompt, setShowHoverPrompt] = useState(true);
-  // New state to detect if device supports hover.
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

@@ -1,8 +1,10 @@
+// app/layout.tsx (or wherever your RootLayout is located)
 import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+/* import PageTransition from "./components/PageTransition"; */
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -17,13 +19,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${jetbrainsMono.variable} antialiased`}>
+        {/*   <PageTransition> */}
         {children}
+        {/* </PageTransition> */}
         <SpeedInsights />
         <Analytics />
       </body>

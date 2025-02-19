@@ -1,0 +1,72 @@
+/* calendarCustom.css */
+.my-calendar .fc {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: var(--border-width-thin) solid var(--sidebar-bg);
+}
+
+.my-calendar .fc-toolbar {
+  background-color: var(--sidebar-bg);
+  border-bottom: var(--border-width-thin) solid var(--glass-border);
+}
+
+.my-calendar .fc-toolbar-title {
+  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.my-calendar .fc-button {
+  background-color: var(--highlight-color);
+  border: none;
+  color: #ffffff;
+  padding: var(--button-padding);
+  border-radius: var(--button-radius);
+  transition: background-color var(--transition-duration)
+    var(--transition-timing);
+}
+
+.my-calendar .fc-button:hover {
+  background-color: var(--highlight-hover);
+}
+
+.my-calendar .fc-event {
+  background-color: var(--highlight-color);
+  color: var(--foreground);
+  border: none;
+  border-radius: var(--button-radius);
+  padding: 0.25rem 0.5rem;
+}
+
+.my-calendar .fc-event:hover {
+  opacity: 0.8;
+}
+
+/* Calendar cells borders */
+.my-calendar .fc-col-header-cell,
+.my-calendar .fc-daygrid-day {
+  border-color: var(--sidebar-bg);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .my-calendar .fc {
+    background-color: var(--background);
+    color: var(--foreground);
+    border-color: var(--sidebar-bg);
+  }
+  .my-calendar .fc-toolbar {
+    background-color: var(--sidebar-bg);
+    border-bottom-color: var(--glass-border);
+  }
+  .my-calendar .fc-toolbar-title {
+    color: var(--foreground);
+  }
+  .my-calendar .fc-button {
+    background-color: var(--highlight-color);
+    color: #ffffff;
+  }
+  .my-calendar .fc-button:hover {
+    background-color: var(--highlight-hover);
+  }
+}
