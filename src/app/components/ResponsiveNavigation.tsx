@@ -20,7 +20,7 @@ export type NavItem = {
 
 export const defaultNavItems: NavItem[] = [
   {
-    href: "/webapp",
+    href: "/webapp/Dashboard",
     title: "Dashboard",
     icon: <HomeIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
   },
