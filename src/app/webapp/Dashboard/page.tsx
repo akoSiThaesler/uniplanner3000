@@ -90,8 +90,8 @@ export default function Dashboard() {
           value="5"
           subtitle="Courses enrolled"
         />
-        <StatsCard title="GPA" value="3.8" subtitle="Current GPA" />
-        <StatsCard title="Notifications" value="3" subtitle="Unread alerts" />
+        {/*  <StatsCard title="GPA" value="3.8" subtitle="Current GPA" /> */}
+        {/* <StatsCard title="Notifications" value="3" subtitle="Unread alerts" /> */}
       </div>
 
       {/* Upcoming events & Notifications */}
