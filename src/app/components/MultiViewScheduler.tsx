@@ -1,0 +1,1079 @@
+"use client";
+import React, { useState, useMemo, useEffect, memo } from "react";
+import { DndProvider, useDrag, useDrop, DragSourceMonitor } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+// --- Helper Functions ---
+const timeToMinutes = (time: string): number => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};
+
+const minutesToTime = (mins: number): string => {
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+};
+
+const roundTimeToSlot = (time: string): string => {
+  const minutes = timeToMinutes(time);
+  const rounded = Math.round(minutes / 30) * 30;
+  return minutesToTime(rounded);
+};
+
+const getExactDateForDay = (currentDate: Date, day: string): Date => {
+  const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const currentDay = currentDate.getDay();
+  const diff = currentDay === 0 ? -6 : 1 - currentDay;
+  const monday = new Date(currentDate);
+  monday.setDate(currentDate.getDate() + diff);
+  const index = weekDays.indexOf(day);
+  const result = new Date(monday);
+  result.setDate(monday.getDate() + index);
+  return result;
+};
+
+const isSameDate = (d1: Date, d2: Date): boolean =>
+  d1.getDate() === d2.getDate() &&
+  d1.getMonth() === d2.getMonth() &&
+  d1.getFullYear() === d2.getFullYear();
+
+const predefinedColors = [
+  "#60a5fa",
+  "#f87171",
+  "#fbbf24",
+  "#34d399",
+  "#a78bfa",
+];
+
+type ViewMode = "daily" | "weekly" | "3day" | "monthly";
+
+interface SchedulerEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  day: string;
+  color?: string;
+  priority?: "high" | "medium" | "low";
+}
+
+const sampleEvents: SchedulerEvent[] = [
+  {
+    id: "1",
+    title: "Math Lecture",
+    description: "Calculus review",
+    date: getExactDateForDay(new Date(), "Monday"),
+    startTime: "09:00",
+    endTime: "10:00",
+    day: "Monday",
+    priority: "high",
+    color: "#f87171",
+  },
+  {
+    id: "2",
+    title: "Physics Lab",
+    description: "Electromagnetism experiments",
+    date: getExactDateForDay(new Date(), "Tuesday"),
+    startTime: "11:00",
+    endTime: "12:00",
+    day: "Tuesday",
+    priority: "medium",
+    color: "#fbbf24",
+  },
+  {
+    id: "3",
+    title: "History Seminar",
+    description: "Modern history overview",
+    date: getExactDateForDay(new Date(), "Wednesday"),
+    startTime: "14:00",
+    endTime: "15:00",
+    day: "Wednesday",
+    priority: "low",
+    color: "#34d399",
+  },
+];
+
+// --- Droppable Cell Component ---
+interface DroppableCellProps {
+  time: string;
+  day: string;
+  onDrop: (eventId: string, time: string, day: string) => void;
+  children: React.ReactNode;
+}
+const DroppableCell: React.FC<DroppableCellProps> = ({
+  time,
+  day,
+  onDrop,
+  children,
+}) => {
+  const [{}, drop] = useDrop({
+    accept: "EVENT",
+    drop: (item: unknown) => {
+      if (typeof item === "object" && item !== null && "id" in item) {
+        onDrop((item as { id: string }).id, time, day);
+      }
+    },
+    collect: () => ({}),
+  });
+  return (
+    <div
+      ref={(node: HTMLDivElement | null): void => {
+        drop(node);
+      }}
+      className="w-full h-full"
+    >
+      {children}
+    </div>
+  );
+};
+
+// --- Draggable Event Component ---
+interface DraggableEventProps {
+  event: SchedulerEvent;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+const DraggableEvent: React.FC<DraggableEventProps> = memo(
+  ({ event, children, onClick }) => {
+    const [{ isDragging }, drag] = useDrag({
+      type: "EVENT",
+      item: { id: event.id },
+      collect: (monitor: DragSourceMonitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    });
+    return (
+      <div
+        ref={(node: HTMLDivElement | null): void => {
+          drag(node);
+        }}
+        style={{ opacity: isDragging ? 0.5 : 1 }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+DraggableEvent.displayName = "DraggableEvent";
+
+// --- Current Time Line Component ---
+interface CurrentTimeLineProps {
+  timelineHeight: number;
+}
+const CurrentTimeLine: React.FC<CurrentTimeLineProps> = ({
+  timelineHeight,
+}) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const currentLineTop = (currentMinutes / 1440) * timelineHeight;
+  return (
+    <div
+      className="absolute left-0 right-0 h-1 bg-red-500"
+      style={{ top: `${currentLineTop}px` }}
+    />
+  );
+};
+
+// --- Main Scheduler Component ---
+interface MultiViewSchedulerProps {
+  widget?: boolean;
+}
+const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
+  widget = false,
+}) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<ViewMode>("weekly");
+  const [events, setEvents] = useState<SchedulerEvent[]>(sampleEvents);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Creation & Editing state
+  const [selectedSlotRange, setSelectedSlotRange] = useState<{
+    day: string;
+    start: string;
+    end: string;
+  } | null>(null);
+  const [newEventTitle, setNewEventTitle] = useState("");
+  const [newEventDescription, setNewEventDescription] = useState("");
+  const [newEventColor, setNewEventColor] = useState("#60a5fa");
+  const [newEventStartTime, setNewEventStartTime] = useState("");
+  const [newEventEndTime, setNewEventEndTime] = useState("");
+  const [newEventDate, setNewEventDate] = useState("");
+  const [editingEvent, setEditingEvent] = useState<SchedulerEvent | null>(null);
+
+  // Timeline Setup
+  const timelineSlots = useMemo(() => {
+    const slots: string[] = [];
+    for (let hour = 0; hour < 24; hour++) {
+      slots.push(`${hour.toString().padStart(2, "0")}:00`);
+      slots.push(`${hour.toString().padStart(2, "0")}:30`);
+    }
+    return slots;
+  }, []);
+  const slotHeight = 40;
+  const timelineHeight = widget ? timelineSlots.length * slotHeight : "100%";
+
+  // Compute Displayed Days
+  const displayedDays = useMemo(() => {
+    const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    if (viewMode === "daily") {
+      const index = currentDate.getDay() - 1;
+      const dayName = weekDays[index] || "Monday";
+      return [{ day: dayName, date: currentDate }];
+    } else if (viewMode === "weekly") {
+      const currentDay = currentDate.getDay();
+      const diff = currentDay === 0 ? -6 : 1 - currentDay;
+      const monday = new Date(currentDate);
+      monday.setDate(currentDate.getDate() + diff);
+      return weekDays.map((d, i) => ({
+        day: d,
+        date: new Date(
+          monday.getFullYear(),
+          monday.getMonth(),
+          monday.getDate() + i
+        ),
+      }));
+    } else if (viewMode === "3day") {
+      const currentDay = currentDate.getDay();
+      const diff = currentDay === 0 ? -6 : 1 - currentDay;
+      const monday = new Date(currentDate);
+      monday.setDate(currentDate.getDate() + diff);
+      return weekDays.slice(0, 3).map((d, i) => ({
+        day: d,
+        date: new Date(
+          monday.getFullYear(),
+          monday.getMonth(),
+          monday.getDate() + i
+        ),
+      }));
+    }
+    return [];
+  }, [viewMode, currentDate]);
+
+  // Drag selection state
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionStart, setSelectionStart] = useState<{
+    time: string;
+    day: string;
+  } | null>(null);
+  const [selectionEnd, setSelectionEnd] = useState<{
+    time: string;
+    day: string;
+  } | null>(null);
+
+  const isCellSelected = (time: string, day: string): boolean => {
+    const timeIndex = timelineSlots.indexOf(time);
+    if (selectedSlotRange && selectedSlotRange.day === day) {
+      const start = timelineSlots.indexOf(selectedSlotRange.start);
+      const end = timelineSlots.indexOf(selectedSlotRange.end);
+      return (
+        timeIndex >= Math.min(start, end) && timeIndex <= Math.max(start, end)
+      );
+    }
+    if (
+      isSelecting &&
+      selectionStart &&
+      selectionEnd &&
+      selectionStart.day === day
+    ) {
+      const start = timelineSlots.indexOf(selectionStart.time);
+      const end = timelineSlots.indexOf(selectionEnd.time);
+      return (
+        timeIndex >= Math.min(start, end) && timeIndex <= Math.max(start, end)
+      );
+    }
+    return false;
+  };
+
+  // Filter events for timeline view
+  const timelineEvents = useMemo(() => {
+    return events.filter((ev) =>
+      displayedDays.some((d) => isSameDate(d.date, ev.date))
+    );
+  }, [events, displayedDays]);
+
+  // Collision handling for overlapping events
+  const calculateLayoutForDay = (
+    dayEvents: SchedulerEvent[]
+  ): { [id: string]: { left: number; width: number } } => {
+    const sorted = [...dayEvents].sort(
+      (a, b) =>
+        timelineSlots.indexOf(a.startTime) - timelineSlots.indexOf(b.startTime)
+    );
+    const groups: SchedulerEvent[][] = [];
+    let currentGroup: SchedulerEvent[] = [];
+    sorted.forEach((event) => {
+      const start = timelineSlots.indexOf(event.startTime);
+      const end = timelineSlots.indexOf(event.endTime);
+      if (currentGroup.length === 0) {
+        currentGroup.push(event);
+      } else {
+        const overlaps = currentGroup.some((e) => {
+          const s = timelineSlots.indexOf(e.startTime);
+          const eEnd = timelineSlots.indexOf(e.endTime);
+          return start < eEnd && s < end;
+        });
+        if (overlaps) {
+          currentGroup.push(event);
+        } else {
+          groups.push(currentGroup);
+          currentGroup = [event];
+        }
+      }
+    });
+    if (currentGroup.length > 0) groups.push(currentGroup);
+    const positions: { [id: string]: { left: number; width: number } } = {};
+    groups.forEach((group) => {
+      const count = group.length;
+      group.forEach((e, idx) => {
+        positions[e.id] = { left: idx * (100 / count), width: 100 / count };
+      });
+    });
+    return positions;
+  };
+
+  const layoutMapping = useMemo(() => {
+    const mapping: {
+      [day: string]: { [eventId: string]: { left: number; width: number } };
+    } = {};
+    displayedDays.forEach((dayObj) => {
+      const dayEvents = timelineEvents.filter((ev) =>
+        isSameDate(ev.date, dayObj.date)
+      );
+      mapping[dayObj.day] = calculateLayoutForDay(dayEvents);
+    });
+    return mapping;
+  }, [displayedDays, timelineEvents, timelineSlots]);
+
+  // Navigation header
+  const displayedHeader = useMemo(() => {
+    if (viewMode === "monthly") {
+      return currentDate.toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric",
+      });
+    } else if (viewMode === "weekly") {
+      const currentDay = currentDate.getDay();
+      const diff = currentDay === 0 ? -6 : 1 - currentDay;
+      const monday = new Date(currentDate);
+      monday.setDate(currentDate.getDate() + diff);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      return `${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}`;
+    } else if (viewMode === "daily") {
+      return currentDate.toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    } else if (viewMode === "3day") {
+      const day3 = new Date(currentDate);
+      day3.setDate(currentDate.getDate() + 2);
+      return `${currentDate.toLocaleDateString()} - ${day3.toLocaleDateString()}`;
+    }
+    return "";
+  }, [viewMode, currentDate]);
+
+  const handlePrev = () => {
+    if (viewMode === "monthly") {
+      setCurrentDate(
+        new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      );
+    } else if (viewMode === "weekly") {
+      setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000));
+    } else if (viewMode === "daily") {
+      setCurrentDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
+    } else if (viewMode === "3day") {
+      setCurrentDate(new Date(currentDate.getTime() - 3 * 24 * 60 * 60 * 1000));
+    }
+  };
+
+  const handleNext = () => {
+    if (viewMode === "monthly") {
+      setCurrentDate(
+        new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+      );
+    } else if (viewMode === "weekly") {
+      setCurrentDate(new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000));
+    } else if (viewMode === "daily") {
+      setCurrentDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
+    } else if (viewMode === "3day") {
+      setCurrentDate(new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000));
+    }
+  };
+
+  // Mouse selection for event creation
+  const handleCellMouseDown = widget
+    ? undefined
+    : (time: string, day: string, e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsSelecting(true);
+        setSelectionStart({ time, day });
+        setSelectionEnd({ time, day });
+        setSelectedSlotRange(null);
+      };
+
+  const handleCellMouseEnter = widget
+    ? undefined
+    : (time: string, day: string) => {
+        if (isSelecting && selectionStart && selectionStart.day === day) {
+          setSelectionEnd({ time, day });
+        }
+      };
+
+  const handleMouseUp = widget
+    ? undefined
+    : () => {
+        if (
+          isSelecting &&
+          selectionStart &&
+          selectionEnd &&
+          selectionStart.day === selectionEnd.day
+        ) {
+          const startIdx = timelineSlots.indexOf(selectionStart.time);
+          const endIdx = timelineSlots.indexOf(selectionEnd.time);
+          const startTime =
+            startIdx <= endIdx ? selectionStart.time : selectionEnd.time;
+          const endTime =
+            startIdx <= endIdx ? selectionEnd.time : selectionStart.time;
+          setSelectedSlotRange({
+            day: selectionStart.day,
+            start: startTime,
+            end: endTime,
+          });
+          setNewEventStartTime(roundTimeToSlot(startTime));
+          setNewEventEndTime(roundTimeToSlot(endTime));
+          setModalVisible(true);
+        }
+        setIsSelecting(false);
+        setSelectionStart(null);
+        setSelectionEnd(null);
+      };
+
+  // Drop handler
+  const handleEventDrop = (
+    eventId: string,
+    newTime: string,
+    newDay: string
+  ) => {
+    const newDateObj = displayedDays.find((d) => d.day === newDay)?.date;
+    if (!newDateObj) return;
+    setEvents((prev) =>
+      prev.map((ev) => {
+        if (ev.id === eventId) {
+          const duration =
+            timeToMinutes(ev.endTime) - timeToMinutes(ev.startTime);
+          const newStartMins = timeToMinutes(newTime);
+          const newEndMins = newStartMins + duration;
+          return {
+            ...ev,
+            day: newDay,
+            startTime: newTime,
+            endTime: minutesToTime(newEndMins),
+            date: newDateObj,
+          };
+        }
+        return ev;
+      })
+    );
+  };
+
+  // Create event handler
+  const handleCreateEvent = () => {
+    if (!newEventTitle.trim()) {
+      alert("Please enter an event title.");
+      return;
+    }
+    if (!newEventStartTime || !newEventEndTime) {
+      alert("Please select start and end times.");
+      return;
+    }
+    const roundedStart = roundTimeToSlot(newEventStartTime);
+    const roundedEnd = roundTimeToSlot(newEventEndTime);
+    const startMins = timeToMinutes(roundedStart);
+    const endMins = timeToMinutes(roundedEnd);
+    if (endMins <= startMins) {
+      alert("End time must be after start time.");
+      return;
+    }
+    const eventDate = newEventDate
+      ? new Date(newEventDate)
+      : selectedSlotRange
+      ? getExactDateForDay(currentDate, selectedSlotRange.day)
+      : new Date();
+    const dayName = selectedSlotRange
+      ? selectedSlotRange.day
+      : eventDate.toLocaleDateString("en-US", { weekday: "long" });
+    const newEvent: SchedulerEvent = {
+      id: Date.now().toString(),
+      title: newEventTitle,
+      description: newEventDescription,
+      date: eventDate,
+      startTime: roundedStart,
+      endTime: roundedEnd,
+      day: dayName,
+      color: newEventColor,
+    };
+    setEvents((prev) => [...prev, newEvent]);
+    setNewEventTitle("");
+    setNewEventDescription("");
+    setNewEventColor("#60a5fa");
+    setNewEventStartTime("");
+    setNewEventEndTime("");
+    setNewEventDate("");
+    setSelectedSlotRange(null);
+  };
+
+  // Edit event handler
+  const handleEventClick = (event: SchedulerEvent) => {
+    if (widget) return;
+    setEditingEvent(event);
+    setNewEventTitle(event.title);
+    setNewEventDescription(event.description || "");
+    setNewEventColor(event.color || "#60a5fa");
+    setNewEventStartTime(event.startTime);
+    setNewEventEndTime(event.endTime);
+    setNewEventDate(event.date.toISOString().split("T")[0]);
+    setModalVisible(true);
+  };
+
+  const handleUpdateEvent = () => {
+    if (!editingEvent) return;
+    if (!newEventTitle.trim()) {
+      alert("Please enter an event title.");
+      return;
+    }
+    if (!newEventStartTime || !newEventEndTime) {
+      alert("Please select start and end times.");
+      return;
+    }
+    const roundedStart = roundTimeToSlot(newEventStartTime);
+    const roundedEnd = roundTimeToSlot(newEventEndTime);
+    const startMins = timeToMinutes(roundedStart);
+    const endMins = timeToMinutes(roundedEnd);
+    if (endMins <= startMins) {
+      alert("End time must be after start time.");
+      return;
+    }
+    const updatedDate = newEventDate
+      ? new Date(newEventDate)
+      : editingEvent.date;
+    setEvents((prev) =>
+      prev.map((ev) => {
+        if (ev.id === editingEvent.id) {
+          return {
+            ...ev,
+            title: newEventTitle,
+            description: newEventDescription,
+            color: newEventColor,
+            startTime: roundedStart,
+            endTime: roundedEnd,
+            date: updatedDate,
+            day: updatedDate.toLocaleDateString("en-US", { weekday: "long" }),
+          };
+        }
+        return ev;
+      })
+    );
+    setEditingEvent(null);
+    setNewEventTitle("");
+    setNewEventDescription("");
+    setNewEventColor("#60a5fa");
+    setNewEventStartTime("");
+    setNewEventEndTime("");
+    setNewEventDate("");
+  };
+
+  // Timeline header
+  const renderTimelineHeader = () => (
+    <div
+      className="grid"
+      style={{
+        gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
+        overflowX: "hidden",
+      }}
+    >
+      <div></div>
+      {displayedDays.map(({ day }) => (
+        <div
+          key={day}
+          className="flex items-center justify-center font-semibold p-2 border-b border-gray-200"
+        >
+          {day}
+        </div>
+      ))}
+    </div>
+  );
+
+  // Timeline view in a flex-col container
+  const renderTimelineView = () => {
+    const gridContent = (
+      <div
+        className="grid h-full"
+        style={{
+          gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
+          gridAutoRows: `${slotHeight}px`,
+          height: timelineHeight,
+        }}
+      >
+        {timelineSlots.map((time) => (
+          <React.Fragment key={time}>
+            <div className="text-center text-xs font-semibold p-1 text-gray-600">
+              {time}
+            </div>
+            {displayedDays.map(({ day }) => (
+              <DroppableCell
+                key={`${time}-${day}`}
+                time={time}
+                day={day}
+                onDrop={handleEventDrop}
+              >
+                <div
+                  onMouseDown={
+                    handleCellMouseDown
+                      ? (e) => handleCellMouseDown(time, day, e)
+                      : undefined
+                  }
+                  onMouseEnter={
+                    handleCellMouseEnter
+                      ? () => handleCellMouseEnter(time, day)
+                      : undefined
+                  }
+                  className={`w-full h-full p-1 m-0.5 border border-gray-200 rounded transition-colors duration-200 ${
+                    isCellSelected(time, day) ? "bg-blue-100" : "bg-white"
+                  }`}
+                ></div>
+              </DroppableCell>
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+
+    const eventsOverlay = (
+      <div
+        className="absolute inset-0 pointer-events-none grid h-full"
+        style={{
+          gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
+          gridAutoRows: `${slotHeight}px`,
+        }}
+      >
+        {timelineEvents.map((event) => {
+          const dayIndex = displayedDays.findIndex((d) =>
+            isSameDate(d.date, event.date)
+          );
+          if (dayIndex === -1) return null;
+          const startIndex = timelineSlots.indexOf(event.startTime);
+          const endIndex = timelineSlots.indexOf(event.endTime);
+          const rowSpan = endIndex - startIndex;
+          const layout =
+            layoutMapping[event.day] && layoutMapping[event.day][event.id]
+              ? layoutMapping[event.day][event.id]
+              : { left: 0, width: 100 };
+          return (
+            <div
+              key={event.id}
+              style={{
+                gridColumn: dayIndex + 2,
+                gridRow: `${startIndex + 1} / span ${rowSpan}`,
+              }}
+              className="relative m-1 pointer-events-auto"
+            >
+              {!widget ? (
+                <DraggableEvent
+                  event={event}
+                  onClick={() => handleEventClick(event)}
+                >
+                  <div
+                    className="absolute top-0 left-0 h-full rounded shadow-md flex items-center justify-center text-xs"
+                    style={{
+                      backgroundColor: event.color || "#bae6fd",
+                      color: "#000",
+                      left: `${layout.left}%`,
+                      width: `${layout.width}%`,
+                    }}
+                  >
+                    {event.title}
+                  </div>
+                </DraggableEvent>
+              ) : (
+                <div
+                  className="absolute top-0 left-0 h-full rounded shadow-md flex items-center justify-center text-xs"
+                  style={{
+                    backgroundColor: event.color || "#bae6fd",
+                    color: "#000",
+                    left: `${layout.left}%`,
+                    width: `${layout.width}%`,
+                  }}
+                >
+                  {event.title}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col h-full">
+        {renderTimelineHeader()}
+        <div
+          className="relative flex-grow overflow-y-auto"
+          onMouseUp={handleMouseUp}
+        >
+          {gridContent}
+          {eventsOverlay}
+          <CurrentTimeLine timelineHeight={timelineSlots.length * slotHeight} />
+        </div>
+      </div>
+    );
+  };
+
+  const renderMonthView = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const daysInMonth = lastDayOfMonth.getDate();
+    const startDay = firstDayOfMonth.getDay();
+    const totalCells = 42;
+    const calendarDays = [];
+    for (let i = 0; i < totalCells; i++) {
+      const dayNumber = i - startDay + 1;
+      calendarDays.push(
+        dayNumber > 0 && dayNumber <= daysInMonth ? dayNumber : null
+      );
+    }
+    const weeks = [];
+    for (let i = 0; i < totalCells; i += 7) {
+      weeks.push(calendarDays.slice(i, i + 7));
+    }
+    const today = new Date();
+    return (
+      <div className="mt-4">
+        <div className="grid grid-cols-7 text-center font-semibold">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div key={d} className="p-2 border border-gray-200">
+              {d}
+            </div>
+          ))}
+        </div>
+        {weeks.map((week, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-7 text-center border-t border-gray-200"
+          >
+            {week.map((day, idx) => {
+              const cellDate = day ? new Date(year, month, day) : null;
+              const isToday = cellDate && isSameDate(cellDate, today);
+              const cellEvents = cellDate
+                ? events.filter((ev) => {
+                    const evDate = ev.date;
+                    return (
+                      evDate.getFullYear() === cellDate.getFullYear() &&
+                      evDate.getMonth() === cellDate.getMonth() &&
+                      evDate.getDate() === cellDate.getDate()
+                    );
+                  })
+                : [];
+              return (
+                <div
+                  key={idx}
+                  className={`p-2 border border-gray-200 h-20 relative ${
+                    isToday ? "bg-yellow-50" : ""
+                  }`}
+                >
+                  {day && (
+                    <div className="absolute top-1 left-1 text-xs font-semibold">
+                      {day}
+                    </div>
+                  )}
+                  {cellEvents.map((ev) => (
+                    <div
+                      key={ev.id}
+                      className="bg-blue-200 text-xs rounded px-1 mt-4 truncate"
+                    >
+                      {ev.title}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderNavigationHeader = () => (
+    <div className="flex justify-between items-center mb-4">
+      <button onClick={handlePrev} className="px-3 py-1 bg-gray-200 rounded">
+        Prev
+      </button>
+      <div className="text-lg font-semibold">{displayedHeader}</div>
+      <button onClick={handleNext} className="px-3 py-1 bg-gray-200 rounded">
+        Next
+      </button>
+    </div>
+  );
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div
+        className={`h-full rounded-lg shadow bg-white ${
+          widget ? "p-2" : "p-4 border border-gray-300"
+        }`}
+      >
+        {!widget && renderNavigationHeader()}
+        {!widget && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {(["daily", "weekly", "3day", "monthly"] as ViewMode[]).map(
+              (mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-4 py-2 rounded ${
+                    viewMode === mode
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              )
+            )}
+          </div>
+        )}
+        {viewMode === "monthly" ? renderMonthView() : renderTimelineView()}
+
+        {/* Creation Modal */}
+        {!widget && modalVisible && selectedSlotRange && !editingEvent && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={() => {
+              setModalVisible(false);
+              setSelectedSlotRange(null);
+            }}
+          >
+            <div
+              className="bg-white p-6 rounded shadow-lg w-80"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-semibold mb-4">Create New Event</h3>
+              <p className="mb-2 text-sm text-gray-600">{`Selected day: ${selectedSlotRange.day}`}</p>
+              <div className="mb-2">
+                <label className="block text-sm font-medium mb-1">Date</label>
+                <input
+                  type="date"
+                  className="w-full border rounded p-2"
+                  value={newEventDate}
+                  onChange={(e) => setNewEventDate(e.target.value)}
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Event Title"
+                className="w-full border rounded p-2 mb-2"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+              />
+              <textarea
+                placeholder="Description"
+                className="w-full border rounded p-2 mb-2"
+                value={newEventDescription}
+                onChange={(e) => setNewEventDescription(e.target.value)}
+              ></textarea>
+              <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">
+                    Start
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full border rounded p-1"
+                    value={newEventStartTime}
+                    onChange={(e) => setNewEventStartTime(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">End</label>
+                  <input
+                    type="time"
+                    className="w-full border rounded p-1"
+                    value={newEventEndTime}
+                    onChange={(e) => setNewEventEndTime(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="mb-2">
+                <label className="block text-sm font-medium mb-1">
+                  Select Color
+                </label>
+                <div className="flex space-x-2">
+                  {predefinedColors.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      className={`w-8 h-8 rounded-full border ${
+                        newEventColor === color
+                          ? "border-black"
+                          : "border-transparent"
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setNewEventColor(color)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    setModalVisible(false);
+                    setSelectedSlotRange(null);
+                    setNewEventStartTime("");
+                    setNewEventEndTime("");
+                    setNewEventDate("");
+                  }}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleCreateEvent();
+                    setModalVisible(false);
+                  }}
+                  className="px-4 py-2 bg-green-500 text-white rounded"
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Modal */}
+        {!widget && modalVisible && editingEvent && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            onClick={() => {
+              setModalVisible(false);
+              setEditingEvent(null);
+            }}
+          >
+            <div
+              className="bg-white p-6 rounded shadow-lg w-80"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-semibold mb-4">Edit Event</h3>
+              <div className="mb-2">
+                <label className="block text-sm font-medium mb-1">Date</label>
+                <input
+                  type="date"
+                  className="w-full border rounded p-2"
+                  value={newEventDate}
+                  onChange={(e) => setNewEventDate(e.target.value)}
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Event Title"
+                className="w-full border rounded p-2 mb-2"
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+              />
+              <textarea
+                placeholder="Description"
+                className="w-full border rounded p-2 mb-2"
+                value={newEventDescription}
+                onChange={(e) => setNewEventDescription(e.target.value)}
+              ></textarea>
+              <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">
+                    Start
+                  </label>
+                  <input
+                    type="time"
+                    className="w-full border rounded p-1"
+                    value={newEventStartTime}
+                    onChange={(e) => setNewEventStartTime(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">End</label>
+                  <input
+                    type="time"
+                    className="w-full border rounded p-1"
+                    value={newEventEndTime}
+                    onChange={(e) => setNewEventEndTime(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="mb-2">
+                <label className="block text-sm font-medium mb-1">
+                  Select Color
+                </label>
+                <div className="flex space-x-2">
+                  {predefinedColors.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      className={`w-8 h-8 rounded-full border ${
+                        newEventColor === color
+                          ? "border-black"
+                          : "border-transparent"
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setNewEventColor(color)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    setModalVisible(false);
+                    setEditingEvent(null);
+                    setNewEventTitle("");
+                    setNewEventDescription("");
+                    setNewEventColor("#60a5fa");
+                    setNewEventStartTime("");
+                    setNewEventEndTime("");
+                    setNewEventDate("");
+                  }}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleUpdateEvent();
+                    setModalVisible(false);
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  Update
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </DndProvider>
+  );
+};
+
+export default MultiViewScheduler;
