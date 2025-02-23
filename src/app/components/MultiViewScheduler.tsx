@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useMemo, useEffect, memo } from "react";
 import { DndProvider, useDrag, useDrop, DragSourceMonitor } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { MultiBackend } from "react-dnd-multi-backend";
+import { HTML5toTouch } from "rdndmb-html5-to-touch";
+import "tailwindcss/tailwind.css";
 
 // --- Helper Functions ---
 const timeToMinutes = (time: string): number => {
@@ -10,7 +12,7 @@ const timeToMinutes = (time: string): number => {
 };
 
 const minutesToTime = (mins: number): string => {
-  const h = Math.floor(mins / 60) % 24;
+  const h = Math.floor(mins / 60);
   const m = mins % 60;
   return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 };
@@ -109,18 +111,17 @@ const DroppableCell: React.FC<DroppableCellProps> = ({
   onDrop,
   children,
 }) => {
-  const [{}, drop] = useDrop({
+  const [, drop] = useDrop({
     accept: "EVENT",
-    drop: (item: unknown) => {
-      if (typeof item === "object" && item !== null && "id" in item) {
-        onDrop((item as { id: string }).id, time, day);
+    drop: (item: { id: string }) => {
+      if (item && item.id) {
+        onDrop(item.id, time, day);
       }
     },
-    collect: () => ({}),
   });
   return (
     <div
-      ref={(node: HTMLDivElement | null): void => {
+      ref={(node) => {
         drop(node);
       }}
       className="w-full h-full"
@@ -147,7 +148,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = memo(
     });
     return (
       <div
-        ref={(node: HTMLDivElement | null): void => {
+        ref={(node) => {
           drag(node);
         }}
         style={{ opacity: isDragging ? 0.5 : 1 }}
@@ -176,7 +177,10 @@ const CurrentTimeLine: React.FC<CurrentTimeLineProps> = ({
     return () => clearInterval(interval);
   }, []);
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-  const currentLineTop = (currentMinutes / 1440) * timelineHeight;
+  // Only show the line if within our range (6:00-19:00)
+  const adjustedMinutes = Math.min(Math.max(currentMinutes, 6 * 60), 19 * 60);
+  const currentLineTop =
+    ((adjustedMinutes - 6 * 60) / ((19 - 6) * 60)) * timelineHeight;
   return (
     <div
       className="absolute left-0 right-0 h-1 bg-red-500"
@@ -197,7 +201,10 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
   const [events, setEvents] = useState<SchedulerEvent[]>(sampleEvents);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Creation & Editing state
+  // Mobile-specific view mode: "list" for a list of month events or "calendar" for the month grid
+  const [mobileView, setMobileView] = useState<"list" | "calendar">("list");
+
+  // Event creation/editing state
   const [selectedSlotRange, setSelectedSlotRange] = useState<{
     day: string;
     start: string;
@@ -211,19 +218,21 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
   const [newEventDate, setNewEventDate] = useState("");
   const [editingEvent, setEditingEvent] = useState<SchedulerEvent | null>(null);
 
-  // Timeline Setup
+  // Timeline slots now limited to 06:00 - 19:00
   const timelineSlots = useMemo(() => {
     const slots: string[] = [];
-    for (let hour = 0; hour < 24; hour++) {
+    for (let hour = 6; hour < 19; hour++) {
       slots.push(`${hour.toString().padStart(2, "0")}:00`);
       slots.push(`${hour.toString().padStart(2, "0")}:30`);
     }
+    slots.push("19:00");
     return slots;
   }, []);
   const slotHeight = 40;
+  // timelineHeight now corresponds to the number of slots within our restricted range
   const timelineHeight = widget ? timelineSlots.length * slotHeight : "100%";
 
-  // Compute Displayed Days
+  // Compute displayed days (for timeline & calendar views)
   const displayedDays = useMemo(() => {
     const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     if (viewMode === "daily") {
@@ -260,7 +269,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     return [];
   }, [viewMode, currentDate]);
 
-  // Drag selection state
+  // Drag selection state (desktop only)
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<{
     time: string;
@@ -295,14 +304,14 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     return false;
   };
 
-  // Filter events for timeline view
+  // Filter events for timeline view (only events whose date matches a displayed day)
   const timelineEvents = useMemo(() => {
     return events.filter((ev) =>
       displayedDays.some((d) => isSameDate(d.date, ev.date))
     );
   }, [events, displayedDays]);
 
-  // Collision handling for overlapping events
+  // Collision handling for overlapping events (desktop only)
   const calculateLayoutForDay = (
     dayEvents: SchedulerEvent[]
   ): { [id: string]: { left: number; width: number } } => {
@@ -342,23 +351,29 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     return positions;
   };
 
-  const layoutMapping = useMemo(() => {
-    const mapping: {
-      [day: string]: { [eventId: string]: { left: number; width: number } };
-    } = {};
-    displayedDays.forEach((dayObj) => {
-      const dayEvents = timelineEvents.filter((ev) =>
-        isSameDate(ev.date, dayObj.date)
-      );
-      mapping[dayObj.day] = calculateLayoutForDay(dayEvents);
-    });
-    return mapping;
-  }, [displayedDays, timelineEvents, timelineSlots]);
+  const layoutMapping = useMemo(
+    () => {
+      const mapping: {
+        [day: string]: { [eventId: string]: { left: number; width: number } };
+      } = {};
+      displayedDays.forEach((dayObj) => {
+        const dayEvents = timelineEvents.filter((ev) =>
+          isSameDate(ev.date, dayObj.date)
+        );
+        mapping[dayObj.day] = calculateLayoutForDay(dayEvents);
+      });
 
-  // Navigation header
-  const displayedHeader = useMemo(() => {
+      return mapping;
+    },
+    /* eslint-disable-next-line */
+    [displayedDays, timelineEvents, timelineSlots]
+  );
+
+  // --- Unified Navigation Header for all views ---
+  const renderNavigationHeader = () => {
+    let headerText = "";
     if (viewMode === "monthly") {
-      return currentDate.toLocaleDateString(undefined, {
+      headerText = currentDate.toLocaleDateString(undefined, {
         month: "long",
         year: "numeric",
       });
@@ -369,21 +384,27 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
       monday.setDate(currentDate.getDate() + diff);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
-      return `${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}`;
-    } else if (viewMode === "daily") {
-      return currentDate.toLocaleDateString(undefined, {
+      headerText = `${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}`;
+    } else if (viewMode === "daily" || viewMode === "3day") {
+      headerText = currentDate.toLocaleDateString(undefined, {
         weekday: "long",
         month: "long",
         day: "numeric",
         year: "numeric",
       });
-    } else if (viewMode === "3day") {
-      const day3 = new Date(currentDate);
-      day3.setDate(currentDate.getDate() + 2);
-      return `${currentDate.toLocaleDateString()} - ${day3.toLocaleDateString()}`;
     }
-    return "";
-  }, [viewMode, currentDate]);
+    return (
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={handlePrev} className="px-3 py-1 bg-gray-200 rounded">
+          Prev
+        </button>
+        <div className="text-lg font-semibold">{headerText}</div>
+        <button onClick={handleNext} className="px-3 py-1 bg-gray-200 rounded">
+          Next
+        </button>
+      </div>
+    );
+  };
 
   const handlePrev = () => {
     if (viewMode === "monthly") {
@@ -413,7 +434,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     }
   };
 
-  // Mouse selection for event creation
+  // Desktop mouse selection for event creation
   const handleCellMouseDown = widget
     ? undefined
     : (time: string, day: string, e: React.MouseEvent) => {
@@ -461,7 +482,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
         setSelectionEnd(null);
       };
 
-  // Drop handler
+  // Drop handler for desktop view
   const handleEventDrop = (
     eventId: string,
     newTime: string,
@@ -501,9 +522,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     }
     const roundedStart = roundTimeToSlot(newEventStartTime);
     const roundedEnd = roundTimeToSlot(newEventEndTime);
-    const startMins = timeToMinutes(roundedStart);
-    const endMins = timeToMinutes(roundedEnd);
-    if (endMins <= startMins) {
+    if (timeToMinutes(roundedEnd) <= timeToMinutes(roundedStart)) {
       alert("End time must be after start time.");
       return;
     }
@@ -526,6 +545,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
       color: newEventColor,
     };
     setEvents((prev) => [...prev, newEvent]);
+    // Reset form
     setNewEventTitle("");
     setNewEventDescription("");
     setNewEventColor("#60a5fa");
@@ -560,9 +580,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     }
     const roundedStart = roundTimeToSlot(newEventStartTime);
     const roundedEnd = roundTimeToSlot(newEventEndTime);
-    const startMins = timeToMinutes(roundedStart);
-    const endMins = timeToMinutes(roundedEnd);
-    if (endMins <= startMins) {
+    if (timeToMinutes(roundedEnd) <= timeToMinutes(roundedStart)) {
       alert("End time must be after start time.");
       return;
     }
@@ -595,13 +613,65 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     setNewEventDate("");
   };
 
-  // Timeline header
+  // Delete event handler
+  const handleDeleteEvent = () => {
+    if (!editingEvent) return;
+    setEvents((prev) => prev.filter((ev) => ev.id !== editingEvent.id));
+    setEditingEvent(null);
+    setNewEventTitle("");
+    setNewEventDescription("");
+    setNewEventColor("#60a5fa");
+    setNewEventStartTime("");
+    setNewEventEndTime("");
+    setNewEventDate("");
+  };
+
+  // --- Mobile List View (all events for the current month) ---
+  const renderMobileListView = () => {
+    const monthEvents = events.filter(
+      (ev) =>
+        ev.date.getFullYear() === currentDate.getFullYear() &&
+        ev.date.getMonth() === currentDate.getMonth()
+    );
+    monthEvents.sort((a, b) => {
+      if (a.date.getTime() === b.date.getTime()) {
+        return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+      }
+      return a.date.getTime() - b.date.getTime();
+    });
+    return (
+      <div className="flex flex-col h-full p-2 space-y-4">
+        {monthEvents.length === 0 ? (
+          <div className="text-center text-gray-500">
+            No events for this month
+          </div>
+        ) : (
+          monthEvents.map((ev) => (
+            <div
+              key={ev.id}
+              onClick={() => handleEventClick(ev)}
+              className="p-4 border rounded shadow-sm bg-white cursor-pointer"
+            >
+              <div className="font-semibold">{ev.title}</div>
+              <div className="text-sm text-gray-600">
+                {ev.date.toLocaleDateString()} {ev.startTime} - {ev.endTime}
+              </div>
+              {ev.description && (
+                <div className="text-sm">{ev.description}</div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    );
+  };
+
+  // --- Desktop Timeline Header ---
   const renderTimelineHeader = () => (
     <div
-      className="grid"
+      className="grid pb-5"
       style={{
-        gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
-        overflowX: "hidden",
+        gridTemplateColumns: `100px repeat(${displayedDays.length}, minmax(100px, 1fr))`,
       }}
     >
       <div></div>
@@ -616,13 +686,13 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     </div>
   );
 
-  // Timeline view in a flex-col container
+  // --- Desktop Timeline View ---
   const renderTimelineView = () => {
     const gridContent = (
       <div
-        className="grid h-full"
+        className="grid"
         style={{
-          gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
+          gridTemplateColumns: `100px repeat(${displayedDays.length}, minmax(100px, 1fr))`,
           gridAutoRows: `${slotHeight}px`,
           height: timelineHeight,
         }}
@@ -663,9 +733,9 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
 
     const eventsOverlay = (
       <div
-        className="absolute inset-0 pointer-events-none grid h-full"
+        className="absolute inset-0 pointer-events-none grid"
         style={{
-          gridTemplateColumns: `100px repeat(${displayedDays.length}, 1fr)`,
+          gridTemplateColumns: `100px repeat(${displayedDays.length}, minmax(100px, 1fr))`,
           gridAutoRows: `${slotHeight}px`,
         }}
       >
@@ -690,26 +760,12 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
               }}
               className="relative m-1 pointer-events-auto"
             >
-              {!widget ? (
-                <DraggableEvent
-                  event={event}
-                  onClick={() => handleEventClick(event)}
-                >
-                  <div
-                    className="absolute top-0 left-0 h-full rounded shadow-md flex items-center justify-center text-xs"
-                    style={{
-                      backgroundColor: event.color || "#bae6fd",
-                      color: "#000",
-                      left: `${layout.left}%`,
-                      width: `${layout.width}%`,
-                    }}
-                  >
-                    {event.title}
-                  </div>
-                </DraggableEvent>
-              ) : (
+              <DraggableEvent
+                event={event}
+                onClick={() => handleEventClick(event)}
+              >
                 <div
-                  className="absolute top-0 left-0 h-full rounded shadow-md flex items-center justify-center text-xs"
+                  className="absolute top-0 left-0 h-full rounded shadow-md flex items-center justify-center text-xs cursor-pointer hover:opacity-90"
                   style={{
                     backgroundColor: event.color || "#bae6fd",
                     color: "#000",
@@ -719,7 +775,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                 >
                   {event.title}
                 </div>
-              )}
+              </DraggableEvent>
             </div>
           );
         })}
@@ -727,10 +783,10 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     );
 
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full relative">
         {renderTimelineHeader()}
         <div
-          className="relative flex-grow overflow-y-auto"
+          className="relative flex-grow overflow-x-hidden"
           onMouseUp={handleMouseUp}
         >
           {gridContent}
@@ -741,6 +797,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     );
   };
 
+  // --- Desktop Month View (Calendar) ---
   const renderMonthView = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -762,7 +819,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     }
     const today = new Date();
     return (
-      <div className="mt-4">
+      <div className="mt-4 overflow-hidden">
         <div className="grid grid-cols-7 text-center font-semibold">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
             <div key={d} className="p-2 border border-gray-200">
@@ -817,34 +874,29 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     );
   };
 
-  const renderNavigationHeader = () => (
-    <div className="flex justify-between items-center mb-4">
-      <button onClick={handlePrev} className="px-3 py-1 bg-gray-200 rounded">
-        Prev
-      </button>
-      <div className="text-lg font-semibold">{displayedHeader}</div>
-      <button onClick={handleNext} className="px-3 py-1 bg-gray-200 rounded">
-        Next
-      </button>
-    </div>
-  );
+  // Determine if mobile (using window.innerWidth)
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth < 768 ? true : false;
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={MultiBackend} options={HTML5toTouch}>
       <div
         className={`h-full rounded-lg shadow bg-white ${
-          widget ? "p-2" : "p-4 border border-gray-300"
+          widget ? "p-2" : "p-4 pb-24 border overflow-hidden border-gray-300"
         }`}
       >
+        {/* Navigation header is now always shown */}
         {!widget && renderNavigationHeader()}
-        {!widget && (
+
+        {/* Desktop view switcher is hidden on mobile */}
+        {!widget && !isMobile && (
           <div className="flex flex-wrap gap-2 mb-4">
             {(["daily", "weekly", "3day", "monthly"] as ViewMode[]).map(
               (mode) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`px-4 py-2 rounded ${
+                  className={`px-4 py-2 rounded flex-shrink-1 ${
                     viewMode === mode
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 text-gray-700"
@@ -856,23 +908,59 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
             )}
           </div>
         )}
-        {viewMode === "monthly" ? renderMonthView() : renderTimelineView()}
+
+        {/* Mobile-specific toggle for List vs Calendar view */}
+        {!widget && isMobile && (
+          <div className="flex justify-center gap-2 mb-4">
+            <button
+              onClick={() => setMobileView("list")}
+              className={`px-4 py-2 rounded ${
+                mobileView === "list"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              List View
+            </button>
+            <button
+              onClick={() => setMobileView("calendar")}
+              className={`px-4 py-2 rounded ${
+                mobileView === "calendar"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              Calendar View
+            </button>
+          </div>
+        )}
+
+        {/* Conditionally render views */}
+        {isMobile
+          ? mobileView === "list"
+            ? renderMobileListView()
+            : renderMonthView()
+          : viewMode === "monthly"
+          ? renderMonthView()
+          : renderTimelineView()}
 
         {/* Creation Modal */}
-        {!widget && modalVisible && selectedSlotRange && !editingEvent && (
+        {!widget && modalVisible && !editingEvent && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             onClick={() => {
               setModalVisible(false);
               setSelectedSlotRange(null);
             }}
           >
             <div
-              className="bg-white p-6 rounded shadow-lg w-80"
+              className="bg-white p-6 rounded shadow-lg w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-semibold mb-4">Create New Event</h3>
-              <p className="mb-2 text-sm text-gray-600">{`Selected day: ${selectedSlotRange.day}`}</p>
+              {selectedSlotRange && (
+                <p className="mb-2 text-sm text-gray-600">{`Selected day: ${selectedSlotRange.day}`}</p>
+              )}
               <div className="mb-2">
                 <label className="block text-sm font-medium mb-1">Date</label>
                 <input
@@ -967,14 +1055,14 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
         {/* Edit Modal */}
         {!widget && modalVisible && editingEvent && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
             onClick={() => {
               setModalVisible(false);
               setEditingEvent(null);
             }}
           >
             <div
-              className="bg-white p-6 rounded shadow-lg w-80"
+              className="bg-white p-6 rounded shadow-lg w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-semibold mb-4">Edit Event</h3>
@@ -1057,6 +1145,15 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                   className="px-4 py-2 bg-gray-300 rounded"
                 >
                   Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleDeleteEvent();
+                    setModalVisible(false);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Delete
                 </button>
                 <button
                   onClick={() => {
