@@ -3,11 +3,16 @@
 @tailwind utilities;
 
 :root {
+  /* Light Mode Palette */
   /* Base colors */
   --background: #ffffff; /* Pure White */
   --foreground: #171717; /* Almost Black */
   --sidebar-bg: #edf0f7; /* Light Blue Gray */
   --footer-bg: #ffffff; /* Pure White */
+  /*
+  --highlight-color: #00bcd4; Teal 500 */
+  /*
+  --highlight-hover: #008ba3;   Teal 600 - Darker*/
 
   /* Border widths */
   --border-width-thin: 1px;
@@ -19,12 +24,16 @@
   --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Glass effect colors */
-  --glass-background: rgba(237, 240, 247, 0.15); /* Light Blue Gray 15% */
-  --glass-border: rgba(255, 255, 255, 0.12); /* White 12% */
-  --glass-shadow: rgba(0, 0, 0, 0.1); /* Black 10% */
-  --text-on-glass: rgba(23, 23, 23, 0.9); /* Dark Gray 90% */
-  --hover-background: rgba(237, 240, 247, 0.65); /* Light Blue Gray 65% */
+  --glass-background: rgba(237, 240, 247, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+  --text-on-glass: rgba(23, 23, 23, 0.9);
+  --hover-background: rgba(237, 240, 247, 0.65);
   --active-background: rgba(23, 23, 23, 0.15); /* Dark Gray 15% */
+
+  /* Accent & Highlight */
+  --highlight-color: #3b82f6; /* Blue 500 */
+  --highlight-hover: #2563eb; /* Blue 600 - Darker */
 
   /* Landing page specific */
   --dot-color: #e5e7eb; /* Light Gray */
@@ -37,23 +46,30 @@
   --vignette-opacity: 0.05;
 }
 
+/* DARK MODE: Override with modern teal/blue-gray palette */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #121212; /* Very Dark Gray */
-    --foreground: #e0e0e0; /* Light Gray */
-    --sidebar-bg: #1a1a1a; /* Dark Gray */
-    --footer-bg: #1f1f1f; /* Slightly Lighter Dark Gray */
+    --background: #1f242e; /* Dark blue-gray */
+    --foreground: #e0e6ed; /* Light, soft text */
+    --sidebar-bg: #282c34; /* Slightly darker blue-gray */
+    --footer-bg: #1f242e;
+    --navbar-background: rgba(40, 44, 52, 0.8);
+    --navbar-foreground: #e0e6ed;
+
+    /* Accent remains the same */
+    --highlight-color: #00bcd4;
+    --highlight-hover: #008ba3;
 
     /* Dark mode glass effects */
-    --glass-background: rgba(30, 30, 30, 0.15); /* Dark Gray 15% */
-    --glass-border: rgba(255, 255, 255, 0.08); /* White 8% */
-    --glass-shadow: rgba(0, 0, 0, 0.2); /* Black 20% */
-    --text-on-glass: rgba(224, 224, 224, 0.9); /* Light Gray 90% */
-    --hover-background: rgba(255, 255, 255, 0.1); /* White 10% */
-    --active-background: rgba(255, 255, 255, 0.15); /* White 15% */
+    --glass-background: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: rgba(0, 0, 0, 0.2);
+    --text-on-glass: rgba(255, 255, 255, 0.9);
+    --hover-background: rgba(0, 188, 212, 0.2);
+    --active-background: rgba(0, 139, 163, 0.2);
 
-    --dot-color: #2d2d2d; /* Dark Gray Dots */
-    --vignette-opacity: 0.3;
+    --dot-color: rgba(0, 188, 212, 0.15); /* Subtle teal dots */
+    --vignette-opacity: 0.25;
   }
 }
 
@@ -61,4 +77,12 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-jetbrains-mono), "Courier New", monospace;
+}
+
+/* Enhanced focus styles for inputs */
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 0 2px var(--highlight-color);
 }

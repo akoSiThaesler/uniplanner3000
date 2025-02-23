@@ -17,10 +17,14 @@
     "autoprefixer": "^10.4.20",
     "framer-motion": "^12.4.2",
     "matter-js": "^0.20.0",
-    "motion": "^12.4.3",
     "next": "15.1.6",
+    "rdndmb-html5-to-touch": "^9.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dnd-multi-backend": "^9.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

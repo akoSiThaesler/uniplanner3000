@@ -4,6 +4,8 @@
   width: 800px;
   height: 400px;
   background-color: transparent;
+  pointer-events: none;
+  touch-action: pan-y;
 }
 
 /* Header section */
@@ -31,6 +33,7 @@
 
 .falling-text-canvas {
   @apply absolute inset-0 w-full h-full pointer-events-none z-0;
+  pointer-events: none;
 }
 
 .word {
@@ -44,7 +47,8 @@
 
 /* Toggle switch */
 .toggle-switch {
-  @apply absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer z-[4] opacity-0 pointer-events-none;
+  @apply absolute top-1/2 right-2.5 cursor-pointer z-[4];
+  pointer-events: auto;
   width: 50px;
   height: 28px;
   background-color: var(--dot-color);

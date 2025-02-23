@@ -30,7 +30,9 @@ export default function ClientLayout({
           [background-size:var(--dot-spacing)_var(--dot-spacing)]"
         >
           <main className="flex-1 p-4">{children}</main>
-          <Footer />
+          <div className="absolute bottom-0 w-full">
+            <Footer />
+          </div>
         </div>
       </div>
     </div>
