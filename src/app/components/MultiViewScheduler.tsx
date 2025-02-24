@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect, memo } from "react";
 import { DndProvider, useDrag, useDrop, DragSourceMonitor } from "react-dnd";
 import { MultiBackend } from "react-dnd-multi-backend";
 import { HTML5toTouch } from "rdndmb-html5-to-touch";
-import "tailwindcss/tailwind.css";
+import { useData } from "../../context/DataContext";
 
 // --- Helper Functions ---
 const timeToMinutes = (time: string): number => {
@@ -50,7 +50,17 @@ const predefinedColors = [
 
 type ViewMode = "daily" | "weekly" | "3day" | "monthly";
 
-interface SchedulerEvent {
+// --- Droppable Cell Component ---
+interface DroppableCellProps {
+  time: string;
+  day: string;
+  onDrop: (eventId: string, time: string, day: string) => void;
+  children: React.ReactNode;
+}
+
+// --- SchedulerEvent Type ---
+// Note: We have added an optional courseId field so events can be linked to courses.
+export interface SchedulerEvent {
   id: string;
   title: string;
   description?: string;
@@ -60,51 +70,34 @@ interface SchedulerEvent {
   day: string;
   color?: string;
   priority?: "high" | "medium" | "low";
+  courseId?: string;
 }
 
-const sampleEvents: SchedulerEvent[] = [
-  {
-    id: "1",
-    title: "Math Lecture",
-    description: "Calculus review",
-    date: getExactDateForDay(new Date(), "Monday"),
-    startTime: "09:00",
-    endTime: "10:00",
-    day: "Monday",
-    priority: "high",
-    color: "#f87171",
-  },
-  {
-    id: "2",
-    title: "Physics Lab",
-    description: "Electromagnetism experiments",
-    date: getExactDateForDay(new Date(), "Tuesday"),
-    startTime: "11:00",
-    endTime: "12:00",
-    day: "Tuesday",
-    priority: "medium",
-    color: "#fbbf24",
-  },
-  {
-    id: "3",
-    title: "History Seminar",
-    description: "Modern history overview",
-    date: getExactDateForDay(new Date(), "Wednesday"),
-    startTime: "14:00",
-    endTime: "15:00",
-    day: "Wednesday",
-    priority: "low",
-    color: "#34d399",
-  },
-];
+// Instead of a hardcoded sampleEvents array, we now derive events from global context.
+// We use useData() to get the global termine and vorlesungen, and then map termine to SchedulerEvent.
+const useGlobalEvents = () => {
+  const { termine, vorlesungen } = useData();
+  return useMemo(() => {
+    return termine.map((t) => {
+      // Find the course corresponding to this event (using vorlesungId).
+      const course = vorlesungen.find((v) => v.id === t.vorlesungId);
+      const eventDate = new Date(t.date);
+      const day = eventDate.toLocaleDateString("en-US", { weekday: "long" });
+      return {
+        id: t.id,
+        title: course?.title || "Unnamed Event",
+        description: course?.description,
+        date: eventDate,
+        startTime: t.startTime,
+        endTime: t.endTime,
+        day,
+        color: "#bae6fd", // default color; adjust as needed
+        courseId: course ? course.id : undefined,
+      } as SchedulerEvent;
+    });
+  }, [termine, vorlesungen]);
+};
 
-// --- Droppable Cell Component ---
-interface DroppableCellProps {
-  time: string;
-  day: string;
-  onDrop: (eventId: string, time: string, day: string) => void;
-  children: React.ReactNode;
-}
 const DroppableCell: React.FC<DroppableCellProps> = ({
   time,
   day,
@@ -196,9 +189,10 @@ interface MultiViewSchedulerProps {
 const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
   widget = false,
 }) => {
+  const globalEvents = useGlobalEvents();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>("weekly");
-  const [events, setEvents] = useState<SchedulerEvent[]>(sampleEvents);
+  const [events, setEvents] = useState<SchedulerEvent[]>(globalEvents);
   const [modalVisible, setModalVisible] = useState(false);
 
   // Mobile-specific view mode: "list" for a list of month events or "calendar" for the month grid
