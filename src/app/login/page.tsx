@@ -1,15 +1,35 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import GlassCard from "../components/GlassCard";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(`${authMode} form submitted.`);
+
+    if (authMode === "login") {
+      const success = await login(email, password);
+      if (success) {
+        router.push("/webapp");
+      } else {
+        setError("Invalid credentials");
+      }
+    } else {
+      // For a prototype sign-up we could simply log the user in as a student.
+      // (In a real app you would handle registration differently.)
+      await login(email, password);
+      router.push("/webapp");
+    }
   };
 
   return (
@@ -64,6 +84,8 @@ export default function Login() {
               placeholder="Email"
               required
               className="p-3 border rounded focus:outline-none focus:ring focus:border-[var(--highlight-color)]"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -74,6 +96,8 @@ export default function Login() {
               placeholder="Password"
               required
               className="p-3 border rounded focus:outline-none focus:ring focus:border-[var(--highlight-color)]"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -91,6 +115,7 @@ export default function Login() {
                 transition={{ duration: 0.3 }}
               />
             )}
+            {error && <p className="text-red-500">{error}</p>}
             <motion.button
               type="submit"
               className="py-3 px-4 bg-[var(--highlight-color)] text-white rounded hover:bg-[var(--highlight-hover)] transition-colors"

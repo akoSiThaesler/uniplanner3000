@@ -158,7 +158,7 @@ const CourseModal = ({
           exit={{ opacity: 0 }}
         ></motion.div>
         <motion.div
-          className="bg-white relative z-50 rounded-lg p-6 max-w-lg w-full shadow-xl"
+          className="bg-[var(--background)] relative z-50 rounded-lg p-6 max-w-lg w-full shadow-xl"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
@@ -186,14 +186,16 @@ const CourseModal = ({
             {course.assignments && course.assignments.length > 0 ? (
               <ul className="list-disc ml-5">
                 {course.assignments.map((a) => (
-                  <li key={a.id} className="text-sm text-gray-600">
+                  <li key={a.id} className="text-sm text-[var(--foreground)]">
                     <strong>{a.title}</strong> (Due: {a.dueDate})
                     {a.description && ` - ${a.description}`}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-600">No assignments available.</p>
+              <p className="text-sm text-[var(--foreground)]">
+                No assignments available.
+              </p>
             )}
           </div>
           <div className="mt-4">
@@ -214,10 +216,12 @@ const CourseModal = ({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-600">No materials available.</p>
+              <p className="text-sm text-[var(--foreground)]">
+                No materials available.
+              </p>
             )}
           </div>
-          <p className="mt-4 text-xs text-gray-600">
+          <p className="mt-4 text-xs text-[var(--foreground)]">
             Teacher: {course.teacherName || "N/A"} | Students:{" "}
             {course.studentNames ? course.studentNames.join(", ") : "N/A"}
           </p>
@@ -267,10 +271,10 @@ const CourseCard = ({
       </div>
       <div className="p-4">
         <h2 className="text-xl font-bold">{course.title}</h2>
-        <p className="text-sm text-gray-700 line-clamp-3">
+        <p className="text-sm text-[var(--foreground)] line-clamp-3">
           {course.description}
         </p>
-        <p className="mt-1 text-xs text-gray-600">
+        <p className="mt-1 text-xs text-[var(--foreground)]">
           Teacher: {course.teacherName || "N/A"} | Students:{" "}
           {course.studentNames ? course.studentNames.join(", ") : "N/A"}
         </p>
@@ -481,7 +485,7 @@ const ConfirmPopup = ({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed bottom-4 right-4 bg-white border rounded shadow-lg p-4 z-50"
+        className="fixed bottom-4 right-4 bg-[var(--background)] border rounded shadow-lg p-4 z-50"
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 50 }}

@@ -2,87 +2,481 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+  CSS Custom Properties (Variables)
+*/
 :root {
-  /* Light Mode Palette */
-  /* Base colors */
-  --background: #ffffff; /* Pure White */
-  --foreground: #171717; /* Almost Black */
-  --sidebar-bg: #edf0f7; /* Light Blue Gray */
-  --footer-bg: #ffffff; /* Pure White */
-  /*
-  --highlight-color: #00bcd4; Teal 500 */
-  /*
-  --highlight-hover: #008ba3;   Teal 600 - Darker*/
+  /* ===== COLORS ===== */
+  /* Base Colors */
+  --background: #ffffff;
+  --background-2: #e2e8f0;
+  --foreground: #171717;
+  --sidebar-bg: #edf0f7;
+  --footer-bg: #ffffff;
 
-  /* Border widths */
+  /* Primary Brand Colors */
+  --primary: 59 130 246; /* Blue 500 in RGB format for Tailwind HSL */
+  --primary-foreground: 255 255 255;
+  --primary-light: #60a5fa; /* Blue 400 */
+  --primary-dark: #2563eb; /* Blue 600 */
+
+  /* Secondary Colors */
+  --secondary: 226 232 240; /* Slate 200 */
+  --secondary-foreground: 15 23 42; /* Slate 900 */
+
+  /* Accent Colors */
+  --accent: 243 244 246; /* Gray 100 */
+  --accent-foreground: 17 24 39; /* Gray 900 */
+
+  --highlight-color: #3b82f6; /* Blue 500 */
+  --highlight-hover: #2563eb; /* Blue 600 - Darker */
+
+  /* Semantic Colors */
+  --success: #10b981; /* Emerald 500 */
+  --warning: #f59e0b; /* Amber 500 */
+  --error: #ef4444; /* Red 500 */
+  --info: #3b82f6; /* Blue 500 */
+
+  /* UI Element Colors */
+  --border: 226 232 240; /* Slate 200 in RGB format */
+  --input: 226 232 240;
+  --ring: 59 130 246;
+  --muted: 241 245 249; /* Slate 100 */
+  --muted-foreground: 100 116 139; /* Slate 500 */
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --destructive: 239 68 68; /* Red 500 */
+  --destructive-foreground: 255 255 255;
+
+  /* ===== TYPOGRAPHY ===== */
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+  --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* Font Sizes - Using rem for better accessibility */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ===== SPACING & LAYOUT ===== */
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+
+  /* Border Radius */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Border Widths */
   --border-width-thin: 1px;
   --border-width-regular: 2px;
   --border-width-thick: 3px;
 
-  /* Animation */
-  --transition-duration: 0.3s;
-  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  /* ===== EFFECTS ===== */
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-  /* Glass effect colors */
+  /* Glass Effect */
   --glass-background: rgba(237, 240, 247, 0.15);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-shadow: rgba(0, 0, 0, 0.1);
   --text-on-glass: rgba(23, 23, 23, 0.9);
   --hover-background: rgba(237, 240, 247, 0.65);
-  --active-background: rgba(23, 23, 23, 0.15); /* Dark Gray 15% */
+  --active-background: rgba(23, 23, 23, 0.15);
 
-  /* Accent & Highlight */
-  --highlight-color: #3b82f6; /* Blue 500 */
-  --highlight-hover: #2563eb; /* Blue 600 - Darker */
+  /* ===== ANIMATIONS ===== */
+  --transition-duration: 0.3s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 300ms;
+  --animation-duration-slow: 500ms;
 
-  /* Landing page specific */
-  --dot-color: #e5e7eb; /* Light Gray */
-  --dot-size: 1px;
+  /* ===== LANDING PAGE SPECIFIC ===== */
+  --dot-color: #d1d5db;
+  --dot-size: 1.25px;
   --dot-spacing: 16px;
-  --highlight-color: #3b82f6; /* Blue 500 */
-  --highlight-hover: #2563eb; /* Blue 600 - Darker */
   --button-padding: 1rem 0.5rem;
   --button-radius: 0.25rem;
   --vignette-opacity: 0.05;
+
+  /* ===== DATA VISUALIZATION ===== */
+  --chart-grid-stroke: #ccc;
+  --chart-axis-stroke: #666;
+  --chart-line-stroke: var(--primary-light);
+  --chart-bar-fill: #82ca9d;
+  --chart-area-stroke: #82ca9d;
+  --pie-color-1: #0088fe;
+  --pie-color-2: #00c49f;
+  --pie-color-3: #ffbb28;
+  --pie-color-4: #ff8042;
+
+  /* ===== ROADMAP PHASE COLORS ===== */
+  --phase-1-color: 79 70 229; /* Indigo */
+  --phase-2-color: 16 185 129; /* Emerald */
+  --phase-3-color: 245 158 11; /* Amber */
+  --phase-4-color: 244 63 94; /* Rose */
 }
 
-/* DARK MODE: Override with modern teal/blue-gray palette */
+/* DARK MODE: Override with modern blue-gray palette */
+.dark {
+  /* ===== COLORS ===== */
+  /* Base Colors */
+  --background: #1f242e;
+  --background-2: #363b45;
+  --foreground: #e0e6ed;
+  --sidebar-bg: #282c34;
+  --footer-bg: #1f242e;
+
+  /* Primary Brand Colors */
+  --primary: 96 165 250; /* Blue 400 in RGB format for better visibility in dark mode */
+  --primary-foreground: 15 23 42;
+  --primary-light: #93c5fd; /* Blue 300 */
+  --primary-dark: #3b82f6; /* Blue 500 */
+
+  /* Secondary Colors */
+  --secondary: 51 65 85; /* Slate 700 */
+  --secondary-foreground: 241 245 249; /* Slate 100 */
+
+  /* Accent Colors */
+  --accent: 31 41 55; /* Gray 800 */
+  --accent-foreground: 243 244 246; /* Gray 100 */
+
+  /* Semantic Colors */
+  --success: #34d399; /* Emerald 400 - brighter for dark mode */
+  --warning: #fbbf24; /* Amber 400 - brighter for dark mode */
+  --error: #f87171; /* Red 400 - brighter for dark mode */
+  --info: #60a5fa; /* Blue 400 - brighter for dark mode */
+
+  /* UI Element Colors */
+  --border: 51 65 85; /* Slate 700 in RGB format */
+  --input: 51 65 85;
+  --ring: 96 165 250;
+  --muted: 51 65 85; /* Slate 700 */
+  --muted-foreground: 148 163 184; /* Slate 400 */
+  --popover: 30 41 59; /* Slate 800 */
+  --popover-foreground: 241 245 249; /* Slate 100 */
+  --card: 30 41 59; /* Slate 800 */
+  --card-foreground: 241 245 249; /* Slate 100 */
+  --destructive: 248 113 113; /* Red 400 */
+  --destructive-foreground: 15 23 42; /* Slate 900 */
+
+  /* ===== EFFECTS ===== */
+  /* Glass Effect */
+  --glass-background: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.2);
+  --text-on-glass: rgba(255, 255, 255, 0.9);
+  --hover-background: rgba(96, 165, 250, 0.2);
+  --active-background: rgba(59, 130, 246, 0.2);
+
+  /* ===== LANDING PAGE SPECIFIC ===== */
+  --dot-color: rgba(96, 165, 250, 0.15); /* Subtle blue dots */
+  --vignette-opacity: 0.25;
+
+  /* ===== DATA VISUALIZATION ===== */
+  --chart-grid-stroke: rgba(224, 230, 237, 0.2);
+  --chart-axis-stroke: rgba(224, 230, 237, 0.5);
+  --chart-line-stroke: var(--primary-light);
+  --chart-bar-fill: var(--primary-light);
+  --chart-area-stroke: var(--primary-light);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1f242e; /* Dark blue-gray */
-    --foreground: #e0e6ed; /* Light, soft text */
-    --sidebar-bg: #282c34; /* Slightly darker blue-gray */
+    /* ===== COLORS ===== */
+    /* Base Colors */
+    --background: #1f242e;
+    --background-2: #363b45;
+    --foreground: #e0e6ed;
+    --sidebar-bg: #282c34;
     --footer-bg: #1f242e;
-    --navbar-background: rgba(40, 44, 52, 0.8);
-    --navbar-foreground: #e0e6ed;
 
-    /* Accent remains the same */
-    --highlight-color: #00bcd4;
-    --highlight-hover: #008ba3;
+    /* Primary Brand Colors */
+    --primary: 96 165 250; /* Blue 400 in RGB format for better visibility in dark mode */
+    --primary-foreground: 15 23 42;
+    --primary-light: #93c5fd; /* Blue 300 */
+    --primary-dark: #3b82f6; /* Blue 500 */
 
-    /* Dark mode glass effects */
+    /* Secondary Colors */
+    --secondary: 51 65 85; /* Slate 700 */
+    --secondary-foreground: 241 245 249; /* Slate 100 */
+
+    /* Accent Colors */
+    --accent: 31 41 55; /* Gray 800 */
+    --accent-foreground: 243 244 246; /* Gray 100 */
+
+    /* Semantic Colors */
+    --success: #34d399; /* Emerald 400 - brighter for dark mode */
+    --warning: #fbbf24; /* Amber 400 - brighter for dark mode */
+    --error: #f87171; /* Red 400 - brighter for dark mode */
+    --info: #60a5fa; /* Blue 400 - brighter for dark mode */
+
+    /* UI Element Colors */
+    --border: 51 65 85; /* Slate 700 in RGB format */
+    --input: 51 65 85;
+    --ring: 96 165 250;
+    --muted: 51 65 85; /* Slate 700 */
+    --muted-foreground: 148 163 184; /* Slate 400 */
+    --popover: 30 41 59; /* Slate 800 */
+    --popover-foreground: 241 245 249; /* Slate 100 */
+    --card: 30 41 59; /* Slate 800 */
+    --card-foreground: 241 245 249; /* Slate 100 */
+    --destructive: 248 113 113; /* Red 400 */
+    --destructive-foreground: 15 23 42; /* Slate 900 */
+
+    /* ===== EFFECTS ===== */
+    /* Glass Effect */
     --glass-background: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
     --glass-shadow: rgba(0, 0, 0, 0.2);
     --text-on-glass: rgba(255, 255, 255, 0.9);
-    --hover-background: rgba(0, 188, 212, 0.2);
-    --active-background: rgba(0, 139, 163, 0.2);
+    --hover-background: rgba(96, 165, 250, 0.2);
+    --active-background: rgba(59, 130, 246, 0.2);
 
-    --dot-color: rgba(0, 188, 212, 0.15); /* Subtle teal dots */
+    /* ===== LANDING PAGE SPECIFIC ===== */
+    --dot-color: rgba(96, 165, 250, 0.15); /* Subtle blue dots */
     --vignette-opacity: 0.25;
+
+    /* ===== DATA VISUALIZATION ===== */
+    --chart-grid-stroke: rgba(224, 230, 237, 0.2);
+    --chart-axis-stroke: rgba(224, 230, 237, 0.5);
+    --chart-line-stroke: var(--primary-light);
+    --chart-bar-fill: var(--primary-light);
+    --chart-area-stroke: var(--primary-light);
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-jetbrains-mono), "Courier New", monospace;
+/* ===== BASE STYLES ===== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: var(--font-jetbrains-mono);
+    overscroll-behavior: none;
+    line-height: var(--leading-normal);
+  }
+
+  /* Improved focus styles for better accessibility */
+  :focus-visible {
+    outline: 2px solid var(--primary-light);
+    outline-offset: 2px;
+  }
+
+  /* Hide scrollbar for cleaner UI but maintain functionality */
+  @media (min-width: 768px) {
+    body::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: var(--background-2);
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: var(--muted-foreground);
+      border-radius: 4px;
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background: rgb(var(--primary));
+    }
+  }
+
+  @media (max-width: 767px) {
+    body::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  input,
+  textarea,
+  select {
+    color: var(--foreground);
+    background-color: var(--background);
+    border: var(--border-width-thin) solid rgb(var(--border));
+    border-radius: var(--radius);
+    padding: var(--spacing-2) var(--spacing-3);
+    transition: all var(--transition-duration) var(--transition-timing);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: rgb(var(--ring));
+    box-shadow: 0 0 0 2px rgba(var(--ring), 0.3);
+  }
+
+  button {
+    transition: all var(--transition-duration) var(--transition-timing);
+  }
+
+  a {
+    color: rgb(var(--primary));
+    text-decoration: none;
+    transition: color var(--transition-duration) var(--transition-timing);
+  }
+
+  a:hover {
+    color: var(--primary-dark);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    color: var(--foreground);
+  }
 }
 
-/* Enhanced focus styles for inputs */
-input:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--highlight-color);
-  box-shadow: 0 0 0 2px var(--highlight-color);
+/* ===== COMPONENT STYLES ===== */
+@layer components {
+  /* Glass Card Component */
+  .glass-card {
+    background: var(--glass-background);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 6px var(--glass-shadow);
+    color: var(--text-on-glass);
+  }
+
+  /* Roadmap Phase Styles */
+  .phase-1 {
+    --phase-color: var(--phase-1-color);
+  }
+
+  .phase-2 {
+    --phase-color: var(--phase-2-color);
+  }
+
+  .phase-3 {
+    --phase-color: var(--phase-3-color);
+  }
+
+  .phase-4 {
+    --phase-color: var(--phase-4-color);
+  }
+}
+
+/* ===== UTILITY STYLES ===== */
+@layer utilities {
+  /* Animations */
+  @keyframes moveDots {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 50px 50px;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Accessibility Utilities */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* 3D Card Styles for Roadmap */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .card-3d-container {
+    transform-style: preserve-3d;
+    transition: all 0.3s ease;
+  }
+
+  /* Responsive Typography */
+  .responsive-text {
+    font-size: clamp(var(--text-base), 1vw + 0.5rem, var(--text-xl));
+  }
+
+  .responsive-heading {
+    font-size: clamp(var(--text-2xl), 3vw + 1rem, var(--text-5xl));
+  }
 }
