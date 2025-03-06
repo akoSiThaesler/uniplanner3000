@@ -389,11 +389,17 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
     }
     return (
       <div className="flex justify-between items-center mb-4">
-        <button onClick={handlePrev} className="px-3 py-1 bg-gray-200 rounded">
+        <button
+          onClick={handlePrev}
+          className="px-3 py-1 bg-gray-200 text-gray-700 rounded"
+        >
           Prev
         </button>
-        <div className="text-lg font-semibold">{headerText}</div>
-        <button onClick={handleNext} className="px-3 py-1 bg-gray-200 rounded">
+        <div className="text-lg font-semibold ">{headerText}</div>
+        <button
+          onClick={handleNext}
+          className="px-3 py-1 bg-gray-200 text-gray-700 rounded"
+        >
           Next
         </button>
       </div>
@@ -644,7 +650,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
             <div
               key={ev.id}
               onClick={() => handleEventClick(ev)}
-              className="p-4 border rounded shadow-sm bg-white cursor-pointer"
+              className="p-4 border rounded shadow-sm bg-[var(--background-2)] cursor-pointer"
             >
               <div className="font-semibold">{ev.title}</div>
               <div className="text-sm text-gray-600">
@@ -693,7 +699,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
       >
         {timelineSlots.map((time) => (
           <React.Fragment key={time}>
-            <div className="text-center text-xs font-semibold p-1 text-gray-600">
+            <div className="text-center text-xs font-semibold p-1 text-[var(--foreground)]">
               {time}
             </div>
             {displayedDays.map(({ day }) => (
@@ -714,8 +720,10 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                       ? () => handleCellMouseEnter(time, day)
                       : undefined
                   }
-                  className={`w-full h-full p-1 m-0.5 border border-gray-200 rounded transition-colors duration-200 ${
-                    isCellSelected(time, day) ? "bg-blue-100" : "bg-white"
+                  className={`w-full h-full p-1 m-0.5 border border-[var(--background-2)] rounded transition-colors duration-200 ${
+                    isCellSelected(time, day)
+                      ? "bg-[var(--glass-background)]"
+                      : "bg-[var(--background)]"
                   }`}
                 ></div>
               </DroppableCell>
@@ -875,8 +883,10 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
   return (
     <DndProvider backend={MultiBackend} options={HTML5toTouch}>
       <div
-        className={`h-full rounded-lg shadow bg-white ${
-          widget ? "p-2" : "p-4 pb-24 border overflow-hidden border-gray-300"
+        className={`h-full rounded-lg shadow bg-[var(--background)] ${
+          widget
+            ? "p-2"
+            : "p-4 pb-24 border overflow-hidden border-[var(--foreground)]"
         }`}
       >
         {/* Navigation header is now always shown */}
@@ -948,7 +958,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
             }}
           >
             <div
-              className="bg-white p-6 rounded shadow-lg w-full max-w-md"
+              className="bg-[var(--background)] p-6 rounded shadow-lg w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-semibold mb-4">Create New Event</h3>
@@ -959,7 +969,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                 <label className="block text-sm font-medium mb-1">Date</label>
                 <input
                   type="date"
-                  className="w-full border rounded p-2"
+                  className="w-full border rounded p-2 border-slate-800 bg-[var(--background-2)]"
                   value={newEventDate}
                   onChange={(e) => setNewEventDate(e.target.value)}
                 />
@@ -967,24 +977,24 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
               <input
                 type="text"
                 placeholder="Event Title"
-                className="w-full border rounded p-2 mb-2"
+                className="w-full border rounded p-2 mb-2 border-slate-800 bg-[var(--background-2)]"
                 value={newEventTitle}
                 onChange={(e) => setNewEventTitle(e.target.value)}
               />
               <textarea
                 placeholder="Description"
-                className="w-full border rounded p-2 mb-2"
+                className="w-full border rounded p-2 mb-2 border-slate-800 bg-[var(--background-2)]"
                 value={newEventDescription}
                 onChange={(e) => setNewEventDescription(e.target.value)}
               ></textarea>
               <div className="flex flex-col sm:flex-row gap-2 mb-2">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-sm font-medium mb-1 ">
                     Start
                   </label>
                   <input
                     type="time"
-                    className="w-full border rounded p-1"
+                    className="w-full border rounded p-1 border-slate-800 bg-[var(--background-2)]"
                     value={newEventStartTime}
                     onChange={(e) => setNewEventStartTime(e.target.value)}
                   />
@@ -993,7 +1003,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                   <label className="block text-sm font-medium mb-1">End</label>
                   <input
                     type="time"
-                    className="w-full border rounded p-1"
+                    className="w-full border rounded p-1 border-slate-800 bg-[var(--background-2)]"
                     value={newEventEndTime}
                     onChange={(e) => setNewEventEndTime(e.target.value)}
                   />
@@ -1028,7 +1038,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                     setNewEventEndTime("");
                     setNewEventDate("");
                   }}
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-4 py-2 bg-gray-300 rounded text-gray-700"
                 >
                   Cancel
                 </button>
@@ -1056,7 +1066,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
             }}
           >
             <div
-              className="bg-white p-6 rounded shadow-lg w-full max-w-md"
+              className="bg-[var(--background)] p-6 rounded shadow-lg w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-xl font-semibold mb-4">Edit Event</h3>
@@ -1064,7 +1074,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                 <label className="block text-sm font-medium mb-1">Date</label>
                 <input
                   type="date"
-                  className="w-full border rounded p-2"
+                  className="w-full border rounded p-2 border-slate-800 bg-[var(--background-2)]"
                   value={newEventDate}
                   onChange={(e) => setNewEventDate(e.target.value)}
                 />
@@ -1072,24 +1082,24 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
               <input
                 type="text"
                 placeholder="Event Title"
-                className="w-full border rounded p-2 mb-2"
+                className="w-full border rounded p-2 mb-2 border-slate-800 bg-[var(--background-2)]"
                 value={newEventTitle}
                 onChange={(e) => setNewEventTitle(e.target.value)}
               />
               <textarea
                 placeholder="Description"
-                className="w-full border rounded p-2 mb-2"
+                className="w-full border rounded p-2 mb-2 border-slate-800 bg-[var(--background-2)]"
                 value={newEventDescription}
                 onChange={(e) => setNewEventDescription(e.target.value)}
               ></textarea>
-              <div className="flex flex-col sm:flex-row gap-2 mb-2">
+              <div className="flex flex-col sm:flex-row gap-2 mb-2 ">
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">
                     Start
                   </label>
                   <input
                     type="time"
-                    className="w-full border rounded p-1"
+                    className="w-full border rounded p-1 border-slate-800 bg-[var(--background-2)]"
                     value={newEventStartTime}
                     onChange={(e) => setNewEventStartTime(e.target.value)}
                   />
@@ -1098,7 +1108,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                   <label className="block text-sm font-medium mb-1">End</label>
                   <input
                     type="time"
-                    className="w-full border rounded p-1"
+                    className="w-full border rounded p-1 border-slate-800 bg-[var(--background-2)]"
                     value={newEventEndTime}
                     onChange={(e) => setNewEventEndTime(e.target.value)}
                   />
@@ -1136,7 +1146,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
                     setNewEventEndTime("");
                     setNewEventDate("");
                   }}
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-4 py-2 bg-gray-300 rounded text-gray-700"
                 >
                   Cancel
                 </button>

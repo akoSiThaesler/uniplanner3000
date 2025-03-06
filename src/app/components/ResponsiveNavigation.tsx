@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import AccountMenu from "./AccountMenu";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "./useMediaQuery";
 import HomeIcon from "@mui/icons-material/Home";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BookIcon from "@mui/icons-material/Book";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import Divider from "@mui/material/Divider";
 import styles from "./Sidebar.module.css";
 
 export type NavItem = {
@@ -20,9 +22,14 @@ export type NavItem = {
 
 export const defaultNavItems: NavItem[] = [
   {
+    href: "/webapp/",
+    title: "Home",
+    icon: <HomeIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
+  },
+  {
     href: "/webapp/Dashboard",
     title: "Dashboard",
-    icon: <HomeIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
+    icon: <DashboardIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
   },
   {
     href: "/webapp/Schedule",
@@ -77,8 +84,24 @@ const MobileDockbar: React.FC<MobileDockbarProps> = ({
   unreadCount,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const dockRef = useRef<HTMLDivElement>(null);
   const toggleDock = () => setIsOpen((prev) => !prev);
   const pathname = usePathname();
+
+  // Auto-close the dock when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dockRef.current && !dockRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const containerClasses =
     "fixed bottom-4 left-1/2 transform -translate-x-1/2 w-auto";
@@ -98,6 +121,7 @@ const MobileDockbar: React.FC<MobileDockbarProps> = ({
   return (
     <>
       <div
+        ref={dockRef}
         className={`${containerClasses} p-3 border border-[var(--glass-border)] bg-[var(--glass-background)]
           backdrop-blur-md rounded-lg shadow-lg flex flex-row justify-center items-center gap-2 sm:gap-3 transform transition-all duration-300 ${dockTransitionClasses}`}
       >
@@ -127,14 +151,7 @@ const MobileDockbar: React.FC<MobileDockbarProps> = ({
             </Link>
           );
         })}
-        <button
-          onClick={toggleDock}
-          type="button"
-          aria-label="Close Dock"
-          className="p-3 rounded-full hover:bg-[var(--hover-background)] transition-all duration-300 cursor-pointer text-[var(--foreground)] hover:scale-105"
-        >
-          <CloseIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />
-        </button>
+        {/* The explicit close button is removed to use auto-close on outside click */}
       </div>
       <button
         onClick={toggleDock}
@@ -164,19 +181,24 @@ type DesktopSidebarProps = {
 };
 
 const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
-  children,
   navItems,
   unreadCount,
 }) => {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const finalSidebarOpen = isSidebarOpen || isHovered;
 
   return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`${styles.sidebar} ${
-        isSidebarOpen ? styles.open : styles.closed
+        finalSidebarOpen ? styles.open : styles.closed
       }`}
+      style={{ overflow: "visible" }}
     >
       <button
         onClick={toggleSidebar}
@@ -190,16 +212,14 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
           let icon = item.icon;
           if (item.href === "/webapp/notifications") {
             icon = (
-              // Use a relative container with overflow visible
-              <div className="relative overflow-visible">
+              <div>
                 {item.icon}
                 {unreadCount > 0 && (
                   <span
                     className="absolute bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs"
-                    // When sidebar is closed, shift badge further right so it's visible
                     style={
-                      !isSidebarOpen
-                        ? { top: "-0.25rem", right: "-1.25rem", zIndex: 10 }
+                      !finalSidebarOpen
+                        ? { top: "-0.25rem", right: "-1.5rem", zIndex: 10 }
                         : { top: "-0.25rem", right: "-0.25rem", zIndex: 10 }
                     }
                   >
@@ -212,19 +232,20 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
           return (
             <Link key={item.href} href={item.href}>
               <li
-                title={isSidebarOpen ? "" : item.title}
+                title={finalSidebarOpen ? "" : item.title}
                 className={`${styles.menuItem} ${
                   pathname === item.href ? styles.active : ""
-                } overflow-visible`}
+                }`}
               >
                 {icon}
-                {isSidebarOpen && <span>{item.title}</span>}
+                {finalSidebarOpen && <span>{item.title}</span>}
               </li>
             </Link>
           );
         })}
       </ul>
-      {children}
+      <Divider variant="middle" flexItem />
+      <AccountMenu />
     </div>
   );
 };

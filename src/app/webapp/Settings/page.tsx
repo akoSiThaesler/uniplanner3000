@@ -1,6 +1,9 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
+import { useMediaQuery } from "@/app/components/useMediaQuery";
+import { useAuth } from "../../../context/AuthContext";
+import UserManagement from "./UserManagement";
+import StudiengaengeManagement from "./StudiengaengeManagement";
 
 type SettingsOption = {
   key: number;
@@ -65,7 +68,10 @@ const uniqueTopics = [
 ];
 
 export default function Settings() {
+  const { user } = useAuth();
   const [settings, setSettings] = useState(settingsOptions);
+  const MOBILE_BREAKPOINT = "(max-width: 768px)";
+  const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
 
   function toggleCheckbox(key: number) {
     setSettings((prevSettings) =>
@@ -88,7 +94,7 @@ export default function Settings() {
 
   function getSettingsLine(option: SettingsOption) {
     return (
-      <div className="flex justify-between items-center pt-4">
+      <div className="flex justify-between items-center py-8">
         <div className="flex">
           <div className="py-1"></div>
           <div>
@@ -119,8 +125,45 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-4">
-      {uniqueTopics.map((topic) => getTopicCard(topic as SettingsTopics))}
+    <div className="p-4 space-y-8">
+      <h1 className="text-2xl font-bold">Settings</h1>
+
+      {/* General Settings Section */}
+      <div>
+        {uniqueTopics.map((topic) => getTopicCard(topic as SettingsTopics))}
+      </div>
+
+      {/* User and Studiengaenge Management Panels – visible only to Admins */}
+      {!isMobile ? (
+        <>
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">
+              Account & User Management
+            </h2>
+            {user?.role === "admin" ? (
+              <UserManagement />
+            ) : (
+              <div className="p-4 border rounded bg-gray-50">
+                <p className="text-lg">
+                  You do not have permission to manage user accounts.
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="mt-8">
+            {/* Studiengaenge Management Panel – visible only to Admins */}
+            {user?.role === "admin" ? (
+              <StudiengaengeManagement />
+            ) : (
+              <div className="p-4 border rounded bg-gray-50">
+                <p className="text-lg">
+                  You do not have permission to manage Classes.
+                </p>
+              </div>
+            )}
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
