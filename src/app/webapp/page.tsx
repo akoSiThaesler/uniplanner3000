@@ -119,7 +119,7 @@ export default function InteractiveBlogPage() {
     thumbnail: "",
     tags: "",
   });
-  const [editingPostId, setEditingPostId] = useState(null);
+  const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [editingData, setEditingData] = useState({
     title: "",
     excerpt: "",
@@ -127,11 +127,11 @@ export default function InteractiveBlogPage() {
     thumbnail: "",
     tags: "",
   });
-  const [expandedPostId, setExpandedPostId] = useState(null);
+  const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Create a new post.
-  const handleCreate = (e) => {
+  const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !newPost.title.trim() ||
@@ -169,12 +169,19 @@ export default function InteractiveBlogPage() {
   };
 
   // Delete a post.
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     setPosts(posts.filter((post) => post.id !== id));
   };
 
   // Start editing a post.
-  const startEditing = (post) => {
+  const startEditing = (post: {
+    id: number;
+    title: string;
+    excerpt: string;
+    content: string;
+    thumbnail: string;
+    tags: string[];
+  }) => {
     setEditingPostId(post.id);
     setEditingData({
       title: post.title,
@@ -186,7 +193,7 @@ export default function InteractiveBlogPage() {
   };
 
   // Save the edited post.
-  const handleEditSave = (id) => {
+  const handleEditSave = (id: number) => {
     const tagsArray =
       editingData.tags.trim() !== ""
         ? editingData.tags
@@ -231,7 +238,7 @@ export default function InteractiveBlogPage() {
   };
 
   // Toggle post expansion to show full content.
-  const toggleExpand = (id) => {
+  const toggleExpand = (id: number) => {
     setExpandedPostId(expandedPostId === id ? null : id);
   };
 
@@ -449,11 +456,11 @@ export default function InteractiveBlogPage() {
           {filteredPosts.map((post) => {
             // Allow modifications only if the user is the post's author,
             // an admin, or the designated owner.
-            const canModify =
+            /*     const canModify =
               user &&
               (user.email === post.author ||
                 user.role === "admin" ||
-                user.email === "owner@example.com");
+                user.email === "owner@example.com"); */
 
             return (
               <motion.article
