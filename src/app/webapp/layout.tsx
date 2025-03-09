@@ -41,9 +41,12 @@ export default function ClientLayout({
         // Mobile layout
         <div
           className="flex flex-col min-h-screen relative w-full 
-            bg-[var(--background)]
-            bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
-            [background-size:var(--dot-spacing)_var(--dot-spacing)]"
+           "
+          style={{
+            background: `radial-gradient(var(--dot-color, rgba(0, 0, 0, 0.1)) var(--dot-size, 1px), transparent var(--dot-size, 1px)), linear-gradient(135deg, var(--sidebar-bg, #f5f7fa), var(--background, #ffffff))`,
+            backgroundSize:
+              "var(--dot-spacing, 20px) var(--dot-spacing, 20px), cover",
+          }}
         >
           <div className="fixed top-0 w-full z-50">
             <NavBar />
