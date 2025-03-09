@@ -959,9 +959,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const deleteTermin = (id: string) => {
     setTermine((prev) => prev.filter((t) => t.id !== id));
   };
-  const deleteUser = (email: string) => {
-    setUsers((prevUsers) => prevUsers.filter((user) => user.email !== email));
-  };
 
   return (
     <DataContext.Provider
