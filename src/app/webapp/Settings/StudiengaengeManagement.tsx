@@ -61,6 +61,10 @@ const StudiengaengeManagement = () => {
   const [selectedTeachers, setSelectedTeachers] = useState<string[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
+  // New state for deletion confirmation
+  const [studiengangToDelete, setStudiengangToDelete] =
+    useState<Studiengang | null>(null);
+
   const openAddDialog = () => {
     setIsAddMode(true);
     setSelectedStudiengang(null);
@@ -75,8 +79,13 @@ const StudiengaengeManagement = () => {
     setSelectedStudiengang(sg);
     setName(sg.name);
     setDescription(sg.description);
-    /*     setSelectedTeachers(sg.teachers || []);
+    /* setSelectedTeachers(sg.teachers || []);
     setSelectedStudents(sg.students || []); */
+  };
+
+  // New function to open delete confirmation dialog
+  const openDeleteDialog = (sg: Studiengang) => {
+    setStudiengangToDelete(sg);
   };
 
   const handleSave = () => {
@@ -86,7 +95,7 @@ const StudiengaengeManagement = () => {
         name,
         description,
         /* teachers: selectedTeachers, */
-        /*  students: selectedStudents, */
+        /* students: selectedStudents, */
       };
       addStudiengang(newStudiengang);
     } else if (selectedStudiengang) {
@@ -94,8 +103,8 @@ const StudiengaengeManagement = () => {
         ...selectedStudiengang,
         name,
         description,
-        /*  teachers: selectedTeachers, */
-        /*   students: selectedStudents, */
+        /* teachers: selectedTeachers, */
+        /* students: selectedStudents, */
       };
       updateStudiengang(updated);
     }
@@ -107,33 +116,48 @@ const StudiengaengeManagement = () => {
     setIsAddMode(false);
   };
 
+  // Handle deletion confirmation
+  const handleDelete = () => {
+    if (studiengangToDelete) {
+      deleteStudiengang(studiengangToDelete.id);
+      setStudiengangToDelete(null);
+    }
+  };
+
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-4">Class Management</h2>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={openAddDialog}
-        className="mb-4"
-      >
-        Add New Class
-      </Button>
+      {/* Header row with left-aligned title and right-aligned add button */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Class Management</h2>
+        <Button variant="contained" color="primary" onClick={openAddDialog}>
+          Add New Class
+        </Button>
+      </div>
+
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Teachers</TableCell>
-            <TableCell>Students</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Name</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>
+              Description
+            </TableCell>
+            {/* Uncomment below if needed */}
+            {/* <TableCell>Teachers</TableCell>
+            <TableCell>Students</TableCell> */}
+            <TableCell sx={{ color: "var(--foreground)" }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {studiengaenge.map((sg: Studiengang) => (
             <TableRow key={sg.id}>
-              <TableCell>{sg.name}</TableCell>
-              <TableCell>{sg.description}</TableCell>
-              {/*    <TableCell>{sg.teachers?.join(", ") || "-"}</TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {sg.name}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {sg.description}
+              </TableCell>
+              {/* Uncomment below if needed */}
+              {/* <TableCell>{sg.teachers?.join(", ") || "-"}</TableCell>
               <TableCell>{sg.students?.join(", ") || "-"}</TableCell> */}
               <TableCell>
                 <Button
@@ -147,7 +171,8 @@ const StudiengaengeManagement = () => {
                   variant="outlined"
                   size="small"
                   color="error"
-                  onClick={() => deleteStudiengang(sg.id)}
+                  onClick={() => openDeleteDialog(sg)}
+                  style={{ marginLeft: 8 }}
                 >
                   Delete
                 </Button>
@@ -157,12 +182,13 @@ const StudiengaengeManagement = () => {
         </TableBody>
       </Table>
 
+      {/* Add/Edit Dialog */}
       <Dialog
         open={isAddMode || Boolean(selectedStudiengang)}
         onClose={handleClose}
       >
-        <DialogTitle>
-          {isAddMode ? "Add New Studiengang" : "Edit Studiengang"}
+        <DialogTitle sx={{ color: "black" }}>
+          {isAddMode ? "Add New Class" : "Edit Class"}
         </DialogTitle>
         <DialogContent>
           <TextField
@@ -220,6 +246,28 @@ const StudiengaengeManagement = () => {
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={Boolean(studiengangToDelete)}
+        onClose={() => setStudiengangToDelete(null)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          {studiengangToDelete && (
+            <p>
+              Are you sure you want to delete the class{" "}
+              <strong>{studiengangToDelete.name}</strong>?
+            </p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStudiengangToDelete(null)}>Cancel</Button>
+          <Button onClick={handleDelete} variant="contained" color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

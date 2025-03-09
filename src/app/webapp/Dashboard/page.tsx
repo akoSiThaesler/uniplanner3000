@@ -106,6 +106,7 @@ export default function Dashboard() {
             )
           }
           sx={{
+            justifyContent: "center",
             backgroundColor: "var(--background)",
             color: "var(--foreground)",
             border: "1px solid var(--foreground)",

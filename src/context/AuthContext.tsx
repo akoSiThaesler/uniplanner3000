@@ -36,6 +36,8 @@ type AuthContextType = {
   users: User[];
   updateUser: (updated: User) => void;
   addUser: (newUser: AuthUser) => void;
+  // New deleteUser function
+  deleteUser: (email: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -149,6 +151,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAuthUsers((prev) => [...prev, newUser]);
   };
 
+  // New deleteUser function: filters out the user with the provided email.
+  const deleteUser = (email: string) => {
+    setAuthUsers((prev) => prev.filter((u) => u.email !== email));
+    // Optionally, if the deleted user is currently logged in, you may log them out:
+    if (user && user.email === email) {
+      logout();
+    }
+  };
+
   // To avoid hydration mismatch when reading from localStorage,
   // only render children after mounting.
   const [mounted, setMounted] = useState(false);
@@ -167,6 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         users,
         updateUser,
         addUser,
+        deleteUser, // Expose deleteUser in the context
       }}
     >
       {children}

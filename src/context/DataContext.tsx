@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
+// Data types for academic data.
 export type Studiengang = {
   id: string;
   name: string;
@@ -27,6 +28,7 @@ export type Vorlesung = {
   }[];
   studentNames?: string[];
   eventIds?: string[];
+  color?: string;
 };
 
 export type Dozent = {
@@ -84,6 +86,18 @@ export type GlobalTeacherData = {
   };
 };
 
+// Blog post type.
+export type BlogPost = {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  date: string;
+  thumbnail: string;
+  author: string;
+  tags: string[];
+};
+
 interface DataContextType {
   studiengaenge: Studiengang[];
   vorlesungen: Vorlesung[];
@@ -104,12 +118,17 @@ interface DataContextType {
   addTermin: (termin: Vorlesungstermin) => void;
   updateTermin: (termin: Vorlesungstermin) => void;
   deleteTermin: (id: string) => void;
+  // Blog posts and CRUD functions.
+  blogPosts: BlogPost[];
+  addBlogPost: (post: BlogPost) => void;
+  updateBlogPost: (post: BlogPost) => void;
+  deleteBlogPost: (id: number) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  // Sample studiengaenge (degree programs)
+  // Sample degree programs.
   const [studiengaenge, setStudiengaenge] = useState<Studiengang[]>([
     { id: "1", name: "Informatik", description: "Informatik" },
     {
@@ -120,29 +139,80 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     { id: "3", name: "BWL", description: "Betriebswirtschaftslehre" },
   ]);
 
-  // Sample courses with teacher and student names
+  // Sample courses.
   const [vorlesungen, setVorlesungen] = useState<Vorlesung[]>([
     {
       id: "1",
-      title: "Web Engineering",
+      title: "Web‑Engineering",
       studiengaengeId: "1",
       teacherName: "Prof. Dr. Schmidt",
       description: "An advanced course on modern web technologies.",
       bannerGradient: "bg-gradient-to-r from-green-500 to-teal-500",
       customIconUrl: "",
       studentNames: ["Alice", "Bob", "Charlie"],
-      eventIds: ["e1", "e2"],
+      eventIds: ["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9"],
+      color: "#60a5fa", // Blue
     },
     {
       id: "2",
-      title: "Betriebswirtschaft",
+      title: "Programming",
+      studiengaengeId: "2",
+      teacherName: "Prof. Dr. Lang",
+      description: "Introduction to programming concepts and practical coding.",
+      bannerGradient: "bg-gradient-to-r from-blue-500 to-indigo-500",
+      customIconUrl: "",
+      studentNames: ["Frank", "Grace", "Heidi"],
+      eventIds: ["t10", "t11", "t12", "t13", "t14", "t15", "t16", "t17"],
+      color: "#f87171", // Red
+    },
+    {
+      id: "3",
+      title: "Math",
       studiengaengeId: "3",
+      teacherName: "Prof. Dr. Gauss",
+      description:
+        "Fundamentals of mathematics including algebra and calculus.",
+      bannerGradient: "bg-gradient-to-r from-green-500 to-teal-500",
+      customIconUrl: "",
+      studentNames: ["Ivan", "Judy"],
+      eventIds: ["t18", "t19", "t20", "t21"],
+      color: "#fbbf24", // Amber
+    },
+    {
+      id: "4",
+      title: "BWL",
+      studiengaengeId: "4",
       teacherName: "Prof. Dr. Müller",
-      description: "Fundamentals of business administration.",
+      description: "Fundamentals of business administration and management.",
       bannerGradient: "bg-gradient-to-r from-purple-600 to-blue-500",
       customIconUrl: "",
-      studentNames: ["David", "Eva"],
-      eventIds: ["e3"],
+      studentNames: ["Karl", "Laura"],
+      eventIds: ["t22", "t23", "t24", "t25", "t26"],
+      color: "#34d399", // Green
+    },
+    {
+      id: "5",
+      title: "Digital Technology",
+      studiengaengeId: "5",
+      teacherName: "Prof. Dr. Fischer",
+      description: "Exploring the impact of digital technology on society.",
+      bannerGradient: "bg-gradient-to-r from-pink-500 to-red-500",
+      customIconUrl: "",
+      studentNames: ["Mallory", "Niaj"],
+      eventIds: ["t27", "t28", "t29", "t30"],
+      color: "#a78bfa", // Purple
+    },
+    {
+      id: "6",
+      title: "Logic",
+      studiengaengeId: "6",
+      teacherName: "Prof. Dr. Turing",
+      description: "Introduction to logical reasoning and formal logic.",
+      bannerGradient: "bg-gradient-to-r from-purple-600 to-blue-500",
+      customIconUrl: "",
+      studentNames: ["Olivia", "Peggy"],
+      eventIds: ["t31", "t32", "t33", "t34", "t35"],
+      color: "#f472b6", // Pink
     },
   ]);
 
@@ -152,7 +222,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   ]);
 
   // Sample students.
-  /* eslint-disable-next-line */
+  //eslint-disable-next-line
   const [students, setStudents] = useState<{ id: string; name: string }[]>([
     { id: "101", name: "Alice" },
     { id: "102", name: "Bob" },
@@ -162,24 +232,270 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   ]);
 
   const [termine, setTermine] = useState<Vorlesungstermin[]>([
+    // Logic on Saturdays in March: 1st, 8th, 15th, 22nd, 29th
     {
-      id: "1",
-      vorlesungId: "1",
-      date: "2025-01-15",
+      id: "t1",
+      vorlesungId: "6",
+      date: "2025-03-01",
       startTime: "10:00",
       endTime: "12:00",
     },
     {
-      id: "2",
+      id: "t2",
+      vorlesungId: "6",
+      date: "2025-03-08",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t3",
+      vorlesungId: "6",
+      date: "2025-03-15",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t4",
+      vorlesungId: "6",
+      date: "2025-03-22",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t5",
+      vorlesungId: "6",
+      date: "2025-03-29",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+
+    // Web‑Engineering on Mondays & Wednesdays:
+    // Mondays: 3rd, 10th, 17th, 24th, 31st
+    {
+      id: "t6",
+      vorlesungId: "1",
+      date: "2025-03-03",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t8",
+      vorlesungId: "1",
+      date: "2025-03-10",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t10",
+      vorlesungId: "1",
+      date: "2025-03-17",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t12",
+      vorlesungId: "1",
+      date: "2025-03-24",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t14",
+      vorlesungId: "1",
+      date: "2025-03-31",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    // Wednesdays: 5th, 12th, 19th, 26th
+    {
+      id: "t7",
+      vorlesungId: "1",
+      date: "2025-03-05",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t9",
+      vorlesungId: "1",
+      date: "2025-03-12",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t11",
+      vorlesungId: "1",
+      date: "2025-03-19",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+    {
+      id: "t13",
+      vorlesungId: "1",
+      date: "2025-03-26",
+      startTime: "10:00",
+      endTime: "12:00",
+    },
+
+    // Programming on Tuesdays & Thursdays:
+    // Tuesdays: 4th, 11th, 18th, 25th
+    {
+      id: "t15",
       vorlesungId: "2",
-      date: "2025-01-16",
+      date: "2025-03-04",
       startTime: "14:00",
       endTime: "16:00",
+    },
+    {
+      id: "t17",
+      vorlesungId: "2",
+      date: "2025-03-11",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    {
+      id: "t19",
+      vorlesungId: "2",
+      date: "2025-03-18",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    {
+      id: "t21",
+      vorlesungId: "2",
+      date: "2025-03-25",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    // Thursdays: 6th, 13th, 20th, 27th
+    {
+      id: "t16",
+      vorlesungId: "2",
+      date: "2025-03-06",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    {
+      id: "t18",
+      vorlesungId: "2",
+      date: "2025-03-13",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    {
+      id: "t20",
+      vorlesungId: "2",
+      date: "2025-03-20",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+    {
+      id: "t22",
+      vorlesungId: "2",
+      date: "2025-03-27",
+      startTime: "14:00",
+      endTime: "16:00",
+    },
+
+    // Math on Fridays: 7th, 14th, 21st, 28th
+    {
+      id: "t23",
+      vorlesungId: "3",
+      date: "2025-03-07",
+      startTime: "08:00",
+      endTime: "10:00",
+    },
+    {
+      id: "t24",
+      vorlesungId: "3",
+      date: "2025-03-14",
+      startTime: "08:00",
+      endTime: "10:00",
+    },
+    {
+      id: "t25",
+      vorlesungId: "3",
+      date: "2025-03-21",
+      startTime: "08:00",
+      endTime: "10:00",
+    },
+    {
+      id: "t26",
+      vorlesungId: "3",
+      date: "2025-03-28",
+      startTime: "08:00",
+      endTime: "10:00",
+    },
+
+    // BWL on Mondays: 3rd, 10th, 17th, 24th, 31st
+    {
+      id: "t27",
+      vorlesungId: "4",
+      date: "2025-03-03",
+      startTime: "12:00",
+      endTime: "14:00",
+    },
+    {
+      id: "t28",
+      vorlesungId: "4",
+      date: "2025-03-10",
+      startTime: "12:00",
+      endTime: "14:00",
+    },
+    {
+      id: "t29",
+      vorlesungId: "4",
+      date: "2025-03-17",
+      startTime: "12:00",
+      endTime: "14:00",
+    },
+    {
+      id: "t30",
+      vorlesungId: "4",
+      date: "2025-03-24",
+      startTime: "12:00",
+      endTime: "14:00",
+    },
+    {
+      id: "t31",
+      vorlesungId: "4",
+      date: "2025-03-31",
+      startTime: "12:00",
+      endTime: "14:00",
+    },
+
+    // Digital Technology on Wednesdays: 5th, 12th, 19th, 26th
+    {
+      id: "t32",
+      vorlesungId: "5",
+      date: "2025-03-05",
+      startTime: "16:00",
+      endTime: "18:00",
+    },
+    {
+      id: "t33",
+      vorlesungId: "5",
+      date: "2025-03-12",
+      startTime: "16:00",
+      endTime: "18:00",
+    },
+    {
+      id: "t34",
+      vorlesungId: "5",
+      date: "2025-03-19",
+      startTime: "16:00",
+      endTime: "18:00",
+    },
+    {
+      id: "t35",
+      vorlesungId: "5",
+      date: "2025-03-26",
+      startTime: "16:00",
+      endTime: "18:00",
     },
   ]);
 
   // Sample teacher graph data.
-  /* eslint-disable-next-line */
+  //eslint-disable-next-line
   const [teacherData, setTeacherData] = useState<GlobalTeacherData>({
     TIF24: {
       "Web-Engineering 101": {
@@ -418,7 +734,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // Sample student graph data.
-  /* eslint-disable-next-line */
+  //eslint-disable-next-line
   const [studentData, setStudentData] = useState<{
     [key: string]: StudentData;
   }>({
@@ -490,7 +806,116 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
-  // CRUD functions.
+  // Blog posts state with sample data.
+  const initialBlogPosts: BlogPost[] = [
+    {
+      id: 1,
+      title: "Introducing Our Latest Feature",
+      excerpt: "Revolutionize your workflow with our new productivity booster.",
+      content:
+        "We're excited to announce our latest feature that revolutionizes productivity. Our new tool integrates seamlessly into your workflow, automates repetitive tasks, and provides real-time analytics to help you make data-driven decisions.",
+      date: "2025-03-01",
+      thumbnail:
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "teacher@example.com",
+      tags: ["feature", "innovation", "productivity"],
+    },
+    {
+      id: 2,
+      title: "Minimalism in Modern UI",
+      excerpt:
+        "Discover how minimalism enhances user experience in digital design.",
+      content:
+        "Modern UI design has embraced minimalism to declutter digital interfaces and focus on what truly matters. This article explores the principles behind minimalism, the benefits of clean design, and how it leads to better user engagement.",
+      date: "2025-02-20",
+      thumbnail:
+        "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "teacher@example.com",
+      tags: ["design", "minimalism", "UI"],
+    },
+    {
+      id: 3,
+      title: "Tech Trends in 2025",
+      excerpt:
+        "Stay ahead with insights on AI, blockchain, and quantum computing.",
+      content:
+        "The technology landscape is evolving rapidly. In this article, we dive into the most promising trends of 2025, including advancements in artificial intelligence, the growing influence of blockchain, and the potential of quantum computing to reshape industries.",
+      date: "2025-02-10",
+      thumbnail:
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "admin@example.com",
+      tags: ["tech", "trends", "innovation"],
+    },
+    {
+      id: 4,
+      title: "Understanding React Hooks",
+      excerpt:
+        "Learn how React Hooks simplify state management and lifecycle methods.",
+      content:
+        "React Hooks have transformed how developers write functional components. This article provides a deep dive into useState, useEffect, and custom hooks, offering practical examples that demonstrate how these powerful tools can simplify complex state management tasks.",
+      date: "2025-03-05",
+      thumbnail:
+        "https://images.unsplash.com/photo-1519337265831-281ec6cc8514?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "owner@example.com",
+      tags: ["react", "hooks", "javascript"],
+    },
+    {
+      id: 5,
+      title: "Mastering CSS Grid Layout",
+      excerpt: "Unlock the full potential of CSS Grid for responsive design.",
+      content:
+        "CSS Grid Layout has revolutionized web design by enabling the creation of complex, responsive layouts with ease. In this comprehensive guide, we explore techniques, best practices, and creative approaches to using CSS Grid to build modern, fluid web interfaces.",
+      date: "2025-03-02",
+      thumbnail:
+        "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "admin@example.com",
+      tags: ["css", "grid", "web design"],
+    },
+    {
+      id: 6,
+      title: "Building Scalable APIs with Node.js",
+      excerpt: "Best practices for creating robust and efficient backend APIs.",
+      content:
+        "Node.js offers a powerful platform for building scalable APIs. This article covers essential techniques including API design, error handling, and performance optimization. Learn how to create robust backend services that can handle high traffic and complex data interactions.",
+      date: "2025-03-03",
+      thumbnail:
+        "https://staticg.sportskeeda.com/editor/2022/05/4b83a-16515997742264-1920.jpg",
+      author: "admin@example.com",
+      tags: ["node", "api", "backend"],
+    },
+    {
+      id: 7,
+      title: "Effective Debugging Techniques",
+      excerpt:
+        "Master the art of debugging to speed up your development process.",
+      content:
+        "Debugging is an indispensable skill for any developer. In this article, we share effective strategies for identifying and resolving code issues—from leveraging advanced logging techniques to utilizing modern debugging tools and best practices for efficient troubleshooting.",
+      date: "2025-03-04",
+      thumbnail:
+        "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      author: "student@example.com",
+      tags: ["debugging", "tips", "development"],
+    },
+  ];
+
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(initialBlogPosts);
+
+  // CRUD functions for blog posts.
+  const addBlogPost = (post: BlogPost) => {
+    setBlogPosts((prev) => [post, ...prev]);
+  };
+
+  const updateBlogPost = (updatedPost: BlogPost) => {
+    setBlogPosts((prev) =>
+      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+    );
+  };
+
+  const deleteBlogPost = (id: number) => {
+    setBlogPosts((prev) => prev.filter((post) => post.id !== id));
+  };
+
+  // CRUD functions for other data.
   const addStudiengang = (studiengang: Studiengang) => {
     setStudiengaenge((prev) => [...prev, studiengang]);
   };
@@ -557,6 +982,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         addTermin,
         updateTermin,
         deleteTermin,
+        blogPosts,
+        addBlogPost,
+        updateBlogPost,
+        deleteBlogPost,
       }}
     >
       {children}

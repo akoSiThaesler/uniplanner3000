@@ -117,19 +117,17 @@ export default function Footer() {
                 <li>
                   <Link
                     href="/#roadmap"
-                    className="transition-colors"
-                    style={{ color: "var(--foreground)" }}
+                    className="transition-colors text-[var(--foreground)] hover:text-[var(--primary-dark)]"
                   >
                     Roadmap
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/changelog"
-                    className="transition-colors"
-                    style={{ color: "var(--foreground)" }}
+                    href="https://github.com/akoSiThaesler/uniplanner3000"
+                    className="transition-colors text-[var(--foreground)] hover:text-[var(--primary-dark)]"
                   >
-                    Changelog
+                    Github Repo
                   </Link>
                 </li>
               </ul>

@@ -91,7 +91,7 @@ const useGlobalEvents = () => {
         startTime: t.startTime,
         endTime: t.endTime,
         day,
-        color: "#bae6fd", // default color; adjust as needed
+        color: course?.color || "#bae6fd",
         courseId: course ? course.id : undefined,
       } as SchedulerEvent;
     });

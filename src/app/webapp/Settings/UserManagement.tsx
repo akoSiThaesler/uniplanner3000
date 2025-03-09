@@ -1,4 +1,3 @@
-// src/app/webapp/Settings/UserManagement.tsx
 "use client";
 import React, { useState } from "react";
 import {
@@ -26,10 +25,13 @@ import {
 } from "@mui/material";
 
 const UserManagement = () => {
-  const { users, updateUser, addUser } = useAuth();
+  const { users, updateUser, addUser, deleteUser } = useAuth();
   // selectedUser will be non-null for edit mode; when null, we use add mode.
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isAddMode, setIsAddMode] = useState(false);
+
+  // New state for delete confirmation
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Fields for both add and edit
   const [editedEmail, setEditedEmail] = useState("");
@@ -57,6 +59,11 @@ const UserManagement = () => {
     setEditedRole("student");
     setEditedCourses("");
     setEditedClasses("");
+  };
+
+  // New function to open delete confirmation dialog
+  const openDeleteDialog = (user: User) => {
+    setUserToDelete(user);
   };
 
   const handleSave = () => {
@@ -100,6 +107,14 @@ const UserManagement = () => {
     setIsAddMode(false);
   };
 
+  // Function to handle delete confirmation
+  const handleDelete = () => {
+    if (userToDelete) {
+      deleteUser(userToDelete.email);
+      setUserToDelete(null);
+    }
+  };
+
   return (
     <div className="flex flex-shrink-0 flex-col gap-4">
       <div
@@ -118,23 +133,40 @@ const UserManagement = () => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>Courses</TableCell>
-            <TableCell>Classes</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Email</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Role</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Courses</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Classes</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map((user: User) => (
             <TableRow key={user.email}>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>{user.courses?.join(", ") || "-"}</TableCell>
-              <TableCell>{user.classes?.join(", ") || "-"}</TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.email}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.role}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.courses?.join(", ") || "-"}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.classes?.join(", ") || "-"}
+              </TableCell>
               <TableCell>
                 <Button variant="outlined" onClick={() => openEditDialog(user)}>
                   Edit
+                </Button>
+                {/* New Delete Button */}
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => openDeleteDialog(user)}
+                  style={{ marginLeft: 8 }}
+                >
+                  Delete
                 </Button>
               </TableCell>
             </TableRow>
@@ -142,8 +174,11 @@ const UserManagement = () => {
         </TableBody>
       </Table>
 
+      {/* Add/Edit Dialog */}
       <Dialog open={isAddMode || Boolean(selectedUser)} onClose={handleClose}>
-        <DialogTitle>{isAddMode ? "Add New User" : "Edit User"}</DialogTitle>
+        <DialogTitle sx={{ color: "black" }}>
+          {isAddMode ? "Add New User" : "Edit User"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Email"
@@ -197,6 +232,28 @@ const UserManagement = () => {
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={Boolean(userToDelete)}
+        onClose={() => setUserToDelete(null)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          {userToDelete && (
+            <p>
+              Are you sure you want to delete the user with email{" "}
+              <strong>{userToDelete.email}</strong>?
+            </p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUserToDelete(null)}>Cancel</Button>
+          <Button onClick={handleDelete} variant="contained" color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
