@@ -1,5 +1,7 @@
 import { JSX } from "@emotion/react/jsx-runtime";
 import { useState } from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import MarkAsUnreadIcon from "@mui/icons-material/MarkAsUnread";
 
 type Notification = {
   key: number;
@@ -93,7 +95,6 @@ export default function NotificationsPage(): JSX.Element {
         <div className="flex justify-between items-center">
           <div className="flex">
             <div className="py-1">
-              {/* Icon */}
               <svg
                 className="fill-current h-6 w-6 text-gray-800 mr-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +118,18 @@ export default function NotificationsPage(): JSX.Element {
               note.isRead ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-700"
             }`}
           >
-            {note.isRead ? "Mark as Unread" : "Mark as Read"}
+            {/* Desktop: show text */}
+            <span className="hidden sm:inline">
+              {note.isRead ? "Mark as Unread" : "Mark as Read"}
+            </span>
+            {/* Mobile: show MUI icon */}
+            <span className="sm:hidden">
+              {note.isRead ? (
+                <MarkAsUnreadIcon fontSize="small" />
+              ) : (
+                <CheckIcon fontSize="small" />
+              )}
+            </span>
           </button>
         </div>
       </div>

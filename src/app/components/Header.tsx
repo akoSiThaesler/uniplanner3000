@@ -9,9 +9,14 @@ import { useAuth } from "../../context/AuthContext";
 type NavBarProps = {
   children?: React.ReactNode;
   onMenuClick?: () => void;
+  isLanding?: boolean;
 };
 
-const NavBar: React.FC<NavBarProps> = ({ children, onMenuClick }) => {
+const NavBar: React.FC<NavBarProps> = ({
+  children,
+  onMenuClick,
+  isLanding = false,
+}) => {
   const MOBILE_BREAKPOINT = "(max-width: 768px)";
   const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -43,7 +48,9 @@ const NavBar: React.FC<NavBarProps> = ({ children, onMenuClick }) => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md shadow-sm border-b border-[var(--border)]"
+      className={`${
+        !isLanding ? "fixed" : "relative"
+      } top-0 left-0 right-0 z-50 backdrop-blur-md shadow-sm border-b border-[var(--border)]`}
       style={{ backgroundColor: "var(--background)" }}
     >
       {/* Full-width container with side padding */}

@@ -2,7 +2,6 @@
 import { DataProvider } from "../../context/DataContext";
 import { useMediaQuery } from "../components/useMediaQuery";
 import NavBar from "../components/Header";
-import Footer from "../components/footer";
 import ResponsiveNavigation from "../components/ResponsiveNavigation";
 
 export default function ClientLayout({
@@ -26,15 +25,15 @@ export default function ClientLayout({
           <div className="flex flex-1">
             <ResponsiveNavigation unreadCount={unreadCount} />
             <div
-              className="flex flex-col flex-1 ml-20 min-h-0 relative
-              bg-[var(--background)]
-              bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
-              [background-size:var(--dot-spacing)_var(--dot-spacing)]"
+              className="flex flex-col flex-1 ml-20 min-h-0 relative"
+              style={{
+                background: `radial-gradient(var(--dot-color, rgba(0, 0, 0, 0.1)) var(--dot-size, 1px), transparent var(--dot-size, 1px)), linear-gradient(135deg, var(--sidebar-bg, #f5f7fa), var(--background, #ffffff))`,
+                backgroundSize:
+                  "var(--dot-spacing, 20px) var(--dot-spacing, 20px), cover",
+              }}
             >
               <main className="flex-1 p-12">{children}</main>
-              <div className=" bottom-0 w-full">
-                <Footer />
-              </div>
+              <div className=" bottom-0 w-full"></div>
             </div>
           </div>
         </div>
@@ -46,8 +45,10 @@ export default function ClientLayout({
             bg-[radial-gradient(var(--dot-color)_var(--dot-size),transparent_var(--dot-size))]
             [background-size:var(--dot-spacing)_var(--dot-spacing)]"
         >
-          <NavBar />
-          <main className="flex-1 p-4 pb-24">{children}</main>
+          <div className="fixed top-0 w-full z-50">
+            <NavBar />
+          </div>
+          <main className="flex-1 px-4 pt-24 pb-4">{children}</main>
           <ResponsiveNavigation unreadCount={unreadCount} />
         </div>
       )}

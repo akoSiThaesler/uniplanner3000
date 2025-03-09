@@ -21,8 +21,8 @@ enum SettingsTopics {
 const settingsOptions: SettingsOption[] = [
   {
     key: 1,
-    title: "Dark mode",
-    explanation: "Turn the whole website into a dark theme when activated",
+    title: "Settings",
+    explanation: "Turn the whole website into a REDACTED",
     value: true,
     topic: SettingsTopics.GENERAL,
   },
@@ -43,7 +43,7 @@ const settingsOptions: SettingsOption[] = [
   {
     key: 4,
     title: "First privacy setting",
-    explanation: "Turn the website into a dark theme when activated",
+    explanation: "Turn the website into a *** when activated",
     value: true,
     topic: SettingsTopics.PRIVACY,
   },
@@ -114,7 +114,9 @@ export default function Settings() {
         className="border-t-4 rounded px-4 py-3 shadow-md mt-2 bg-gray-100 border-gray-400 text-gray-800"
         role="alert"
       >
-        <h1 className="text-xl font-bold">{topic}</h1>
+        <h1 className="text-xl font-bold text-[var(--foreground-dark)]">
+          {topic}
+        </h1>
         {settings
           .filter((option) => option.topic === topic)
           .map((option) => (
@@ -126,7 +128,7 @@ export default function Settings() {
 
   return (
     <div className="p-4 space-y-8">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Settings</h1>
 
       {/* General Settings Section */}
       <div>
@@ -144,7 +146,7 @@ export default function Settings() {
               <UserManagement />
             ) : (
               <div className="p-4 border rounded bg-gray-50">
-                <p className="text-lg">
+                <p className="text-lg text-[var(--foreground-dark)]">
                   You do not have permission to manage user accounts.
                 </p>
               </div>
@@ -156,7 +158,7 @@ export default function Settings() {
               <StudiengaengeManagement />
             ) : (
               <div className="p-4 border rounded bg-gray-50">
-                <p className="text-lg">
+                <p className="text-lg text-[var(--foreground-dark)]">
                   You do not have permission to manage Classes.
                 </p>
               </div>

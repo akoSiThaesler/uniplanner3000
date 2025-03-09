@@ -22,7 +22,7 @@ export type NavItem = {
 
 export const defaultNavItems: NavItem[] = [
   {
-    href: "/webapp/",
+    href: "/webapp",
     title: "Home",
     icon: <HomeIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
   },
@@ -37,7 +37,7 @@ export const defaultNavItems: NavItem[] = [
     icon: <CalendarMonthIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
   },
   {
-    href: "/webapp/courses",
+    href: "/webapp/Courses",
     title: "Courses",
     icon: <BookIcon sx={{ fontSize: { xs: "24px", sm: "28px" } }} />,
   },
@@ -83,7 +83,7 @@ const MobileDockbar: React.FC<MobileDockbarProps> = ({
   navItems,
   unreadCount,
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const toggleDock = () => setIsOpen((prev) => !prev);
   const pathname = usePathname();
@@ -133,9 +133,9 @@ const MobileDockbar: React.FC<MobileDockbarProps> = ({
               <div className="relative">
                 {item.icon}
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
                     {unreadCount}
-                  </span>
+                  </div>
                 )}
               </div>
             );
@@ -185,7 +185,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   unreadCount,
 }) => {
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -215,16 +215,16 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
               <div>
                 {item.icon}
                 {unreadCount > 0 && (
-                  <span
+                  <div
                     className="absolute bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs"
                     style={
                       !finalSidebarOpen
-                        ? { top: "-0.25rem", right: "-1.5rem", zIndex: 10 }
+                        ? { top: "-0.25rem", right: "-1.0rem", zIndex: 10 }
                         : { top: "-0.25rem", right: "-0.25rem", zIndex: 10 }
                     }
                   >
                     {unreadCount}
-                  </span>
+                  </div>
                 )}
               </div>
             );
@@ -238,7 +238,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
                 }`}
               >
                 {icon}
-                {finalSidebarOpen && <span>{item.title}</span>}
+                {/* Always render the span so CSS can animate it */}
+                <span>{item.title}</span>
               </li>
             </Link>
           );

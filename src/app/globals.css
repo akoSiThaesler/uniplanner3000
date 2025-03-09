@@ -15,7 +15,7 @@
   --footer-bg: #ffffff;
 
   /* Primary Brand Colors */
-  --primary: 59 130 246; /* Blue 500 in RGB format for Tailwind HSL */
+  --primary: #2563eb; /* Blue 500 in RGB format for Tailwind HSL */
   --primary-foreground: 255 255 255;
   --primary-light: #60a5fa; /* Blue 400 */
   --primary-dark: #2563eb; /* Blue 600 */
@@ -153,11 +153,12 @@
   --background: #1f242e;
   --background-2: #363b45;
   --foreground: #e0e6ed;
+  --foreground-dark: #171717;
   --sidebar-bg: #282c34;
   --footer-bg: #1f242e;
 
   /* Primary Brand Colors */
-  --primary: 96 165 250; /* Blue 400 in RGB format for better visibility in dark mode */
+  --primary: #2563eb; /* Blue 400 in RGB format for better visibility in dark mode */
   --primary-foreground: 15 23 42;
   --primary-light: #93c5fd; /* Blue 300 */
   --primary-dark: #3b82f6; /* Blue 500 */
@@ -217,6 +218,7 @@
     --background: #1f242e;
     --background-2: #363b45;
     --foreground: #e0e6ed;
+    --foreground-dark: #171717;
     --sidebar-bg: #282c34;
     --footer-bg: #1f242e;
 
