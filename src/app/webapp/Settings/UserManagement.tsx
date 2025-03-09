@@ -133,20 +133,28 @@ const UserManagement = () => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>Courses</TableCell>
-            <TableCell>Classes</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Email</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Role</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Courses</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Classes</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map((user: User) => (
             <TableRow key={user.email}>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>{user.courses?.join(", ") || "-"}</TableCell>
-              <TableCell>{user.classes?.join(", ") || "-"}</TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.email}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.role}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.courses?.join(", ") || "-"}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {user.classes?.join(", ") || "-"}
+              </TableCell>
               <TableCell>
                 <Button variant="outlined" onClick={() => openEditDialog(user)}>
                   Edit
@@ -168,7 +176,9 @@ const UserManagement = () => {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isAddMode || Boolean(selectedUser)} onClose={handleClose}>
-        <DialogTitle>{isAddMode ? "Add New User" : "Edit User"}</DialogTitle>
+        <DialogTitle sx={{ color: "black" }}>
+          {isAddMode ? "Add New User" : "Edit User"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Email"

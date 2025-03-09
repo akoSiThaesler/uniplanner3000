@@ -137,19 +137,25 @@ const StudiengaengeManagement = () => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Description</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Name</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>
+              Description
+            </TableCell>
             {/* Uncomment below if needed */}
             {/* <TableCell>Teachers</TableCell>
             <TableCell>Students</TableCell> */}
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ color: "var(--foreground)" }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {studiengaenge.map((sg: Studiengang) => (
             <TableRow key={sg.id}>
-              <TableCell>{sg.name}</TableCell>
-              <TableCell>{sg.description}</TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {sg.name}
+              </TableCell>
+              <TableCell sx={{ color: "var(--foreground)" }}>
+                {sg.description}
+              </TableCell>
               {/* Uncomment below if needed */}
               {/* <TableCell>{sg.teachers?.join(", ") || "-"}</TableCell>
               <TableCell>{sg.students?.join(", ") || "-"}</TableCell> */}
@@ -181,7 +187,9 @@ const StudiengaengeManagement = () => {
         open={isAddMode || Boolean(selectedStudiengang)}
         onClose={handleClose}
       >
-        <DialogTitle>{isAddMode ? "Add New Class" : "Edit Class"}</DialogTitle>
+        <DialogTitle sx={{ color: "black" }}>
+          {isAddMode ? "Add New Class" : "Edit Class"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Name"
