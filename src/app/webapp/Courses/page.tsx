@@ -549,10 +549,12 @@ export default function Courses() {
   };
 
   const handleCourseSubmit = (course: Course) => {
-    if (courseToEdit) {
+    if (course.id) {
+      // Update existing course if id is present.
       updateVorlesung(course);
       setSnackbar({ open: true, message: "Course updated successfully!" });
     } else {
+      // Add a new course if no id exists.
       addVorlesung({ ...course, id: Date.now().toString() });
       setSnackbar({ open: true, message: "Course added successfully!" });
     }
@@ -613,7 +615,7 @@ export default function Courses() {
                 id: "",
                 title: "",
                 studiengaengeId: "",
-                lecturerId: "",
+                teacherName: "",
               } as Course)
             }
           >
