@@ -5,6 +5,7 @@ import type React from "react";
 import Image from "next/image";
 import NavBar from "./components/Header";
 import GlassCard from "./components/GlassCard";
+import { useSwipeable } from "react-swipeable";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import LogoWall from "./components/LogoWall";
 import { useRef, useState } from "react";
@@ -276,8 +277,18 @@ export default function Landing() {
   const RoadmapTabs = () => {
     const [activeTab, setActiveTab] = useState(0);
 
+    // Swipe handlers for mobile devices
+    const handlers = useSwipeable({
+      onSwipedLeft: () =>
+        setActiveTab((prev) => Math.min(roadmapItems.length - 1, prev + 1)),
+      onSwipedRight: () => setActiveTab((prev) => Math.max(0, prev - 1)),
+      preventScrollOnSwipe: true,
+      trackTouch: true,
+    });
+
     return (
-      <div className="w-full max-w-6xl mx-auto">
+      // Spread the handlers on the container element
+      <div className="w-full max-w-6xl mx-auto" {...handlers}>
         {/* Tab Navigation */}
         <div className="flex flex-wrap justify-center mb-8 gap-2">
           {roadmapItems.map((item, index) => (
@@ -304,6 +315,7 @@ export default function Landing() {
           ))}
         </div>
 
+        {/* Mobile Navigation with swipe (visible on mobile only) */}
         <div className="flex justify-between items-center mb-6 md:hidden">
           <button
             onClick={() => setActiveTab((prev) => Math.max(0, prev - 1))}
@@ -343,11 +355,11 @@ export default function Landing() {
           <div className="hidden md:flex items-center mb-6">
             <div
               className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 
-              ${
-                roadmapItems[activeTab].completed
-                  ? `bg-${roadmapItems[activeTab].color}-100 text-${roadmapItems[activeTab].color}-600 dark:bg-${roadmapItems[activeTab].color}-900/30 dark:text-${roadmapItems[activeTab].color}-300`
-                  : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-              }`}
+                ${
+                  roadmapItems[activeTab].completed
+                    ? `bg-${roadmapItems[activeTab].color}-100 text-${roadmapItems[activeTab].color}-600 dark:bg-${roadmapItems[activeTab].color}-900/30 dark:text-${roadmapItems[activeTab].color}-300`
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                }`}
             >
               {roadmapItems[activeTab].completed ? (
                 <CheckCircleRounded className="w-6 h-6" />
@@ -550,7 +562,7 @@ export default function Landing() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7, duration: 0.8 }}
-                    className="text-sm text-[var(--foreground)] dark:text-[var(--foreground-dark)]"
+                    className="text-sm text-[var(--foreground)]"
                   >
                     Join now to improve university life with Uniplanner !
                   </motion.p>

@@ -653,7 +653,7 @@ const MultiViewScheduler: React.FC<MultiViewSchedulerProps> = ({
               className="p-4 border rounded shadow-sm bg-[var(--background-2)] cursor-pointer"
             >
               <div className="font-semibold">{ev.title}</div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-[var(--foreground)]">
                 {ev.date.toLocaleDateString()} {ev.startTime} - {ev.endTime}
               </div>
               {ev.description && (
